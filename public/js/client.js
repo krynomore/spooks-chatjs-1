@@ -1746,10 +1746,29 @@ $(function() {
 
 $(function() {
     var autoCompleteList = false;
-
     $('<div id="autocomplete"></div>').css('bottom', $('#input-message').outerHeight() + 20 + 'px').appendTo('body');
     $('#input-message').keydown(function(e) {
-        if (e.keyCode == 9 && !autoCompleteList) {
+        var im = $('#input-message');
+        var value = im.val();
+        if (e.keyCode == 9 && value && value.substr(0,1)) {
+    	    e.preventDefault();
+    	    var roles = ['god','super','admin','mod','basic','mute'];
+            var ur_role = CLIENT.get('role');
+            var possible = _.filter(_.keys(COMMANDS), function(key) {
+                var cmd_level = COMMANDS[key].role;
+                return key.indexOf(value.substring(1,20)) == 0 && 
+(cmd_level == null || roles.indexOf(ur_role) <= roles.indexOf(cmd_level));
+            });
+            switch (possible.length) {
+                case 0:
+                    break;
+                case 1:
+                    im.val('/'+possible[0]);
+                    break;
+                default:
+                    CLIENT.show('Possible: '+possible.join(', '));
+            }
+        } else if (e.keyCode == 9 && !autoCompleteList) {
             // on tab
             e.preventDefault();
             var match = $(this).val().match(/\S+?$/);
