@@ -413,7 +413,7 @@ a:hover {
 |*|
 \*/
 
-#marquee {
+.marquee {
     position: relative;
     width:95%;
     -o-animation: rightThenLeft 15s infinite;
@@ -423,7 +423,7 @@ a:hover {
     animation: rightThenLeft 15s infinite;
 }
 
-#flashing {
+.flashing {
     width: 95%;
     -o-animation: flash 15s linear;
     -ms-animation: flash 15s linear;
@@ -432,12 +432,18 @@ a:hover {
     animation: flash 15s linear;
 }
 
-#spookytext {
+.spookytext {
     text-shadow: 0 0 2px white;
     color: transparent;
 }
 
-#neon {
+.flame {
+    color: yellow;
+    text-shadow: 0px -3px 11px rgba(255, 0, 0, 0.4),  
+                 0px -3px 3px rgba(255, 145, 0, 0.5);
+}
+
+.neon {
     -o-animation: neon1 1.5s ease-in-out alternate;
     -o-animation-iteration-count: 20;
     -ms-animation: neon1 1.5s ease-in-out alternate;
@@ -450,17 +456,17 @@ a:hover {
     animation-iteration-count: 20;
 }
 
-#spoil {
+.spoil {
     background-color: black;
     color: black;
     cursor: default;
 }
 
-#spoil:hover {
+.spoil:hover {
     color:white;
 }
 
-#rotat {
+.rotat {
     -o-animation: rotate 3s ease-in-out alternate;
     -ms-animation: rotate 3s ease-in-out alternate;
     -moz-animation: rotate 3s ease-in-out alternate;
