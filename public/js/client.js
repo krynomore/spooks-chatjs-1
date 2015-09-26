@@ -1631,19 +1631,20 @@ parser = {
             str = str.replace(/\\./g, this.repslsh);
         // Add styles
         if (CLIENT.get('styles') == 'on'){
-            str = this.multiple(str, /\/\!!([^\|]+)\|?/g, '<div id=neon>$1</div>');
-            str = this.multiple(str, /\/\=([^\|]+)\|?/g, '<div id=no-shadow>$1</div>');
-            str = this.multiple(str, /\/\&#35;([^\|]+)\|?/g, '<div id=spoil>$1</div>');
-            str = this.multiple(str, /\/\+([^\|]+)\|?/g, '<div id=rotat>$1</div>');
+            str = this.multiple(str, /\/\!!([^\|]+)\|?/g, '<div class=neon>$1</div>');
+            str = this.multiple(str, /\/\^\^([^\|]+)\|?/g, '<div class=flame>$1</div>');
+            str = this.multiple(str, /\/\=([^\|]+)\|?/g, '<div class=no-shadow>$1</div>');
+            str = this.multiple(str, /\/\&#35;([^\|]+)\|?/g, '<div class=spoil>$1</div>');
+            str = this.multiple(str, /\/\+([^\|]+)\|?/g, '<div class=rotat>$1</div>');
             str = this.multiple(str, /\/\^([^\|]+)\|?/g, '<big>$1</big>');
             str = this.multiple(str, /\/\*([^\|]+)\|?/g, '<strong>$1</strong>');
             str = this.multiple(str, /\/\%([^\|]+)\|?/g, '<i>$1</i>');
             str = this.multiple(str, /\/\_([^\|]+)\|?/g, '<u>$1</u>');
             str = this.multiple(str, /\/\-([^\|]+)\|?/g, '<strike>$1</strike>');
-            str = str.replace(/\/\&amp;([^\|]+)\|?/g, '<div id=marquee>$1</div>');
+            str = str.replace(/\/\&amp;([^\|]+)\|?/g, '<div class=marquee>$1</div>');
             var ghostly = 'color: transparent;';
             str = this.multiple(str, /\/\@([^\|]+)\|?/g, '<div id=test style="text-shadow: 0 0 2px white;'+ghostly+'">$1</div>')
-            str = this.multiple(str, /\/\!([^\|]+)\|?/g, '<div id=flashing>$1</div>');
+            str = this.multiple(str, /\/\!([^\|]+)\|?/g, '<div class=flashing>$1</div>');
             str = this.multiple(str, /\/\&#126;([^\|]+)\|?/g, '<small>$1</small>');
             str = this.multiple(str, /\/\`([^\|]+)\|?/g, '<code>$1</code>');
         }
