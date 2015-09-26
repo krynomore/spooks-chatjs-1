@@ -266,7 +266,7 @@ $(function() {
             'color style flair mute play mute_speak images styles bg role access_level part mask frame'.split(' ').forEach(function(key) {
                 this.on('change:' + key, function(m, value) {
                     if (value) {
-                        this.show(key + ' changed to: ' + value);
+                        this.show(key + ': ' + value);
                     } else {
                         this.show(key + ' reset to default');
                     }
