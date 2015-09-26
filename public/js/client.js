@@ -1751,7 +1751,7 @@ $(function() {
     $('#input-message').keydown(function(e) {
         var im = $('#input-message');
         var value = im.val();
-        if (e.keyCode == 9 && value && value.substr(0,1)) {
+        if (e.keyCode == 9 && value && value.substr(0,1) == '/') {
     	    e.preventDefault();
     	    var roles = ['god','super','admin','mod','basic','mute'];
             var ur_role = CLIENT.get('role');
