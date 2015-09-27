@@ -375,7 +375,7 @@ $(function() {
         },
         updateMousePosition : function(position) {
             socket.emit('updateMousePosition', position);
-         }	
+         }
     }));
 });
 
@@ -1662,17 +1662,13 @@ parser = {
         // Javascript links
         str = str.replace(/(\/\?)([^\|]+)\|([^\|]+)\|?/gi, function(_, __, a, b){
             a = a.replace(/&#35;/gi, '#');
-            if(/[^:]*javascript *:/im.test(a)) {
-                    if (b.trim() == ""){
-                    	return '<div><a href="javascript:void(0)" title = "'+a+'" onclick = "'+a+'">' + '[JavaScript]' + '</a>&nbsp;<a onclick="window.prompt(&quot;The text is below&quot;,&quot;'+a+'&quot;);">[Copy]</a></div>';
-                    }
-                    return '<div><a href="javascript:void(0)" title = "'+a+'" onclick = "'+a+'">' + b.trim() + '</a>&nbsp;<a onclick="window.prompt(&quot;The text is below&quot;,&quot;'+a+'&quot;);">[Copy]</a></div>';
-            } else {
-                if (b.trim() == ""){
-                    return '<div><a href="javascript:void(0)" title = "'+a+'" onclick = "'+a+'">' + '[Script]' + '</a>&nbsp;<a onclick="window.prompt(&quot;The text is below&quot;,&quot;'+a+'&quot;);">[Copy]</a></div>';
-                }
-                    return '<div><a href="javascript:void(0)" title = "'+a+'" onclick = "'+a+'">' + b.trim() + '</a>&nbsp;<a onclick="window.prompt(&quot;The text is below&quot;,&quot;'+a+'&quot;);">[Copy]</a></div>';
+            if(!/[^:]*javascript *:/im.test(a)) {
+                a = 'javascript:'+a;
             }
+            if (!b.trim()) {
+                return '<div><a href="javascript:void(0)" title = "'+a+'" class="jslink" onclick = "'+a+'">' + a + '</a></div>';
+            }
+            return '<div><a href="javascript:void(0)" title = "'+a+'" class="jslink" onclick = "'+a+'">' + b.trim() + '</a></div>';
         });
         // Replace colors
         str = this.multiple(str, /&#35;&#35;([\da-f]{6}|[\da-f]{3})(.+)$/i, '<span style="background-color: #$1;">$2</span>');
@@ -1757,7 +1753,7 @@ $(function() {
             var ur_role = CLIENT.get('role');
             var possible = _.filter(_.keys(COMMANDS), function(key) {
                 var cmd_level = COMMANDS[key].role;
-                return key.indexOf(value.substring(1,20)) == 0 && 
+                return key.indexOf(value.substring(1,20)) == 0 &&
 (cmd_level == null || roles.indexOf(ur_role) <= roles.indexOf(cmd_level));
             });
             switch (possible.length) {
