@@ -413,6 +413,17 @@ a:hover {
 |*|
 \*/
 
+a.jslink
+{
+    color: #FFF;
+}
+
+a.jslink:hover,
+a.jslink:visited
+{
+    color: #AAA;
+}
+
 .marquee {
     position: relative;
     width:95%;
