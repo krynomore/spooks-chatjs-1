@@ -7,6 +7,9 @@ var BLACKLIST = ['get.rekt', 'you.bitch.cunt'];
 // Create list of online users
 ONLINE = new Backbone.Collection();
 
+//Array shortcut [Array.last()]
+Array.prototype.last = function(){return this[this.length-1]}
+
 $(function() {
     var CLIENT_RECAPTCHA_KEY = "6Lcw6wcTAAAAANJlc4WS4P4uecBjcLjW7jtHrZCm";
     var socket = io('/' + window.channel);
@@ -1745,9 +1748,8 @@ $(function() {
     var autoCompleteList = false;
     $('<div id="autocomplete"></div>').css('bottom', $('#input-message').outerHeight() + 20 + 'px').appendTo('body');
     $('#input-message').keydown(function(e) {
-        var im = $('#input-message');
-        var value = im.val();
-        if (e.keyCode == 9 && value && value.substr(0,1) == '/') {
+        var value = $(this).val();
+        if (e.keyCode == 9 && value.substr(0,1) == '/' && value.split(' ').last()) {
     	    e.preventDefault();
     	    var roles = ['god','super','admin','mod','basic','mute'];
             var ur_role = CLIENT.get('role');
@@ -1760,7 +1762,7 @@ $(function() {
                 case 0:
                     break;
                 case 1:
-                    im.val('/'+possible[0]);
+                    $(this).val('/'+possible[0]);
                     break;
                 default:
                     CLIENT.show('Possible: '+possible.join(', '));
