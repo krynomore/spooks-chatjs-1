@@ -1456,7 +1456,7 @@ add = function(att, user){
     if (user.toLowerCase() == CLIENT.get('nick').toLowerCase()) {
         errorMessage('You may not add yourself');
     } else {
-        var block = JSON.parse(CLIENT.get(att) || '[]');
+        var block = CLIENT.get(att);
         if (block.indexOf(user) == -1){
             block.push(user);
             CLIENT.show(user + ' has been added');
@@ -1479,12 +1479,12 @@ remove = function(att, user) {
         CLIENT.show(att + ' has been cleared');
         return;
     }
-    var block = JSON.parse(CLIENT.get(att));
+    var block = CLIENT.get(att);
     var index = block.indexOf(user);
     if (index != -1) {
         block.splice(index, 1);
         CLIENT.show(user + ' was removed.');
-        CLIENT.set(att, JSON.stringify(block));
+        CLIENT.set(att, block);
     } else {
         errorMessage('That nick is not on the list');
     }
