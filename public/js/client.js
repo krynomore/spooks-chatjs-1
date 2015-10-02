@@ -253,7 +253,7 @@ $(function() {
     CLIENT = new (Backbone.Model.extend({
         initialize : function() {
             /* Initialize from localstorage. */
-            'color tjoin font style mute mute_speak play nick images security msg flair styles bg access_level role part block alert menu_top menu_left menu_display mask frame'.split(' ').forEach(function(key) {
+            'color tjoin font style mute mute_speak play nick images security msg flair styles bg access_level role part menu_top menu_left menu_display mask frame'.split(' ').forEach(function(key) {
                 var item = localStorage.getItem('chat-' + key);
                 this.set(key, item);
                 this.on('change:' + key, function(m, value) {
@@ -441,7 +441,7 @@ $(function() {
     //Set the frame when it is changed
     CLIENT.on('change:frame_src', function(m) {
         var url = CLIENT.get('frame_src');
-        if(CLIENT.get('frame') == 'on' && parser.linkreg.exec(url) && url != 'none'){
+        if(CLIENT.get('frame') == 'on' && parser.linkreg.exec(url) && url){
             $('#messages').append("<div class=frame><iframe width=\"100%\" height=\"100%\" src=\"" + url + "\"frameborder=\"0\" sandbox=\"allow-same-origin allow-scripts\"></iframe></div>")
         } else if(url == "none") {
             $(".frame").remove();
@@ -460,16 +460,14 @@ $(function() {
             $("#youtube")[0].innerHTML = "";
         }
     });
-    // All attributes to set
-    var attList = ['images', 'bg', 'styles', 'block', 'alert', 'frame', 'frame_src', 'play', 'tcolor'];
-    for (var i = 0; i < attList.length; i++){
-    	var x = attList[i];
-        if (!CLIENT.get(x))
-            if ('block alert frame_src'.search(x) != -1) // Include here attributes to set to ''
-                CLIENT.set(x, '');
-            else
-                CLIENT.set(x, 'on'); // Default is 'on'
-    }
+    // All attributes to set at init
+    _.each(['images', 'bg', 'styles', 'frame', 'play', 'tcolor'], function(elem){
+        CLIENT.set(elem, 'on');
+    });
+
+    _.each(['block', 'alert'], function(elem){
+        CLIENT.set(elem, []);
+    });
 });
 
 // ------------------------------------------------------------------
@@ -1282,7 +1280,7 @@ $(function() {
                     } else {
 	                    CLIENT.show({
 	                        type : 'escaped-message',
-	                        message : params.attribute_name + ' is currently set to: ' + (CLIENT.get(attribute_name) || 'none')
+	                        message : params.attribute_name + ' is currently set to: ' + (CLIENT.get(attribute_name)|| 'none')
 	                    });
                     }
                 } else {
@@ -1475,7 +1473,7 @@ add = function(att, user){
  */
 remove = function(att, user) {
     if (user == 'all') {//unblock all clears list
-        CLIENT.set(att, "");
+        CLIENT.set(att, []);
         CLIENT.show(att + ' has been cleared');
         return;
     }
