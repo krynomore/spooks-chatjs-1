@@ -25,4 +25,4 @@ For local testing use:
 `nodejs server`
 
 ## Developing
-Contact or E-Mail Landon at landonjpowell@airmail.cc to gain development privs. 
+Contact or E-Mail Landon at landonjpowell@airmail.cc to gain development privs or make a pull request directly through git or github.  
