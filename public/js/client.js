@@ -572,10 +572,8 @@ $(function() {
         drag : function(){
             CLIENT.set('menu_left',$(this).css('left'));
             CLIENT.set('menu_top',$(this).css('top'));
-            if (parseInt($(this).css('top')) > -60){
-                $(this).draggable("option", "containment", "");
-            }
-        }
+        },
+        containment: 'body'
     });
 
     $('#messages').droppable({
@@ -595,8 +593,6 @@ $(function() {
         out: function(event, ui){
             //expand chat-bar
             $('#input-message').css('width','100%');
-            //set containment
-            $('#tabbed-menu-cotainer').draggable('option','containment','#messages');
         }
     });
 
