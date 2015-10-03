@@ -17,13 +17,8 @@ $(function() {
 
     //Add user to list and show message
     socket.on('join', function(user) {
-        var tjoin;
-        if (tjoin !== 'on' || 'off') {
-            CLIENT.set('tjoin', 'on');
-        }
-
         ONLINE.add(user);
-        if (CLIENT.has('tjoin') && CLIENT.get('tjoin') == 'on') {
+        if (CLIENT.get('join') == 'on') {
             CLIENT.show({
                 type : 'general-message',
                 message : user.nick + ' has joined '
@@ -74,7 +69,7 @@ $(function() {
     //Shows user leave message with part, if it exists
     socket.on('left', function(user) {
         ONLINE.remove(user.id);
-        if (!user.kicked && CLIENT.get('tjoin') == 'on') {
+        if (!user.kicked && CLIENT.get('join') == 'on') {
             CLIENT.show({
                 type : 'general-message',
                 message : user.nick + ' has left ' + (user.part ? user.part : '')
@@ -253,7 +248,7 @@ $(function() {
     CLIENT = new (Backbone.Model.extend({
         initialize : function() {
             /* Initialize from localstorage. */
-            'color tjoin font style mute mute_speak play nick images security msg flair styles bg access_level role part menu_top menu_left menu_display mask frame'.split(' ').forEach(function(key) {
+            'color join font style mute mute_speak play nick images security msg flair styles bg access_level role part menu_top menu_left menu_display mask frame'.split(' ').forEach(function(key) {
                 var item = localStorage.getItem('chat-' + key);
                 this.set(key, item);
                 this.on('change:' + key, function(m, value) {
@@ -460,14 +455,6 @@ $(function() {
             $("#youtube")[0].innerHTML = "";
         }
     });
-    // All attributes to set at init
-    _.each(['images', 'bg', 'styles', 'frame', 'play', 'tcolor'], function(elem){
-        CLIENT.set(elem, 'on');
-    });
-
-    _.each(['block', 'alert'], function(elem){
-        CLIENT.set(elem, []);
-    });
 });
 
 // ------------------------------------------------------------------
@@ -506,6 +493,15 @@ $(function() {
             document.styleSheets[1].deleteRule(15);
             document.styleSheets[1].insertRule(".scrollbar_default::-webkit-scrollbar-thumb { border-radius: 5px; background: " + style[1] + "",15);
         }
+    });
+
+    // All attributes to set at init
+    _.each(['images', 'bg', 'styles', 'frame', 'play', 'join'], function(elem){
+        CLIENT.set(elem, 'on');
+    });
+
+    _.each(['block', 'alert'], function(elem){
+        CLIENT.set(elem, []);
     });
 });
 
@@ -1230,14 +1226,12 @@ $(function() {
             params : [ 'attribute_name' ],
             handler : function(params) {
                 var attribute_name = params.attribute_name;
-                var valid = 'theme color font style flair mute mute_speak play images note topic styles bg part block background mask msg alert security frame frame_src join tjoin'.split(' ');
+                var valid = 'theme color font style flair mute mute_speak play images note topic styles bg part block background mask msg alert security frame frame_src join'.split(' ');
                 if (valid.indexOf(attribute_name) >= 0) {
                     if (attribute_name == 'note') {
                         attribute_name = 'notification';
                     } else if (attribute_name == 'bg') {
                         attribute_name = 'background';
-                    } else if (attribute_name == 'join') {
-                        attribute_name = 'tjoin';
                     } else if (attribute_name == 'topic') {
                         getTopicData();
                     } if (attribute_name == 'theme') {
@@ -1306,18 +1300,18 @@ $(function() {
                 Below; Fix for /toggle bg */
                     CLIENT.set('bg','on');
                 } else if (att == 'join' || att == 'leave'){
-                    if (CLIENT.get('tjoin') == 'on' || CLIENT.get('tjoin') == null && CLIENT.set('tjoin','on')){
-                        CLIENT.show('Join and leave mesages disabled');
+                    if (CLIENT.get('join') == 'off'){
+                        CLIENT.show('Join and leave mesages enabled');
                     } else {
-                        CLIENT.show('Join and leave message enabled');
+                        CLIENT.show('Join and leave message disabled');
                     }
-                    toggled = 'tjoin';
+                    toggled = 'join';
                 } else if (att == 'speak' || att == 'mute_speak'){
                   toggled = 'mute_speak';
                 } else if (att != 'style' && att != 'font'){
                     toggled = att;
                 }
-                CLIENT.set(toggled, CLIENT.get(toggled) == 'on' ? 'off' : 'on');
+                CLIENT.set(toggled, CLIENT.get(toggled) == 'off' ? 'on' : 'off');
             }
         },
         private : {
@@ -1342,16 +1336,20 @@ $(function() {
             params : [ 'url' ]
         },
         safe : function(){
-            CLIENT.set('bg','off'),
-            CLIENT.set('images','off'),
-            CLIENT.set('mute_speak','on')
-            CLIENT.set('frame','off')
+            CLIENT.set({
+                bg: 'off',
+                images: 'off',
+                mute_speak: 'on',
+                frame: 'off'
+            });
         },
         unsafe : function(){
-            CLIENT.set('bg','on'),
-            CLIENT.set('images','on'),
-            CLIENT.set('mute_speak','off')
-            CLIENT.set('frame','on')
+            CLIENT.set({
+                bg: 'on',
+                images: 'on',
+                mute_speak: 'off',
+                frame: 'on'
+            });
         },
         msg : {
             params : [ 'message$' ]
@@ -1452,7 +1450,7 @@ add = function(att, user){
     } else {
         var block = CLIENT.get(att);
         if (block.indexOf(user) == -1){
-            if (typeof block !== "object") CLIENT.set(att, []); 
+            if (typeof block !== "object") CLIENT.set(att, []);
             block.push(user);
             CLIENT.show(user + ' has been added');
             CLIENT.set(att, block); /* Leaving in some old code so I can bitch l8r */
