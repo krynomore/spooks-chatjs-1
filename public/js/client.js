@@ -1457,6 +1457,7 @@ add = function(att, user){
         var block = CLIENT.get(att);
         if (block.indexOf(user) == -1){
             block.push(user);
+            if (typeof CLIENT.get('alert') !== "object") CLIENT.set(att, []); 
             CLIENT.show(user + ' has been added');
             CLIENT.set(att, block); /* Leaving in some old code so I can bitch l8r */
         } else {
