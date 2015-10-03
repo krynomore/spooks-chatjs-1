@@ -1754,7 +1754,7 @@ $(function() {
     $('<div id="autocomplete"></div>').css('bottom', $('#input-message').outerHeight() + 20 + 'px').appendTo('body');
     $('#input-message').keydown(function(e) {
         var value = $(this).val();
-        if (e.keyCode == 9 && value.substr(0,1) == '/' && value.split(' ').length == 1) {
+        if (e.keyCode == 9 && value.substr(0,1) == '/' && value.split(' ').length > 0) {
     	    e.preventDefault();
     	    var roles = ['god','super','admin','mod','basic','mute'];
             var ur_role = CLIENT.get('role');
