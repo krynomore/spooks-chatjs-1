@@ -1,4 +1,3 @@
-var DATE_FORMAT = 'shortTime';
 var BLACKLIST = [];
 // ------------------------------------------------------------------
 // Client
@@ -21,7 +20,7 @@ $(function() {
         if (CLIENT.get('join') == 'on') {
             CLIENT.show({
                 type : 'general-message',
-                message : user.nick + ' has joined '
+                message : user.nick + ' joined '
             });
         }
 
@@ -72,7 +71,7 @@ $(function() {
         if (!user.kicked && CLIENT.get('join') == 'on') {
             CLIENT.show({
                 type : 'general-message',
-                message : user.nick + ' has left ' + (user.part ? user.part : '')
+                message : user.nick + ' left ' + (user.part ? ': ' + user.part : '')
             });
         }
     });
@@ -143,7 +142,7 @@ $(function() {
     //Displays disconnect message... that's really all.
     socket.on('disconnect', function() {
         ONLINE.reset();
-        errorMessage('Disconnected');
+        CLIENT.error('Disconnected');
     });
 
     //Refreshes window on command
@@ -174,73 +173,73 @@ $(function() {
      */
     function parseParams(name, input, expect) {
         if ('pm block alert unblock unalert'.split(' ').indexOf(name) != -1 && input.trim() == ""){
-            errorMessage('Invalid: /'+name+' <nick>');
-            return;
-        }
+            CLIENT.error('Invalid: /'+name+' <nick>');
+        } else {
         //Simplified switch statement for client-side commands
-        switch(name) {
-            case 'pm':
-                var pm = /^(.*?[^\\])\|([\s\S]*)$/.exec(input);
-                if (pm) {
-                    var nick = pm[1].replace('\\|', '|');
-                    return {
-                        nick : nick,
-                        message : pm[2],
-                    };
-                }
-                break;
-            case 'block':
-            case 'alert':
-                add(name, input.trim());
-                break;
-            case 'unblock':
-            case 'unalert':
-                remove(name.substring(2),input.trim());
-                break;
-            case 'kick':
-            case 'ban':
-            case 'permaban':
-            case 'speak':
-                var pm = /^(.*?[^\\])(?:\|([\s\S]*))?$/.exec(input);
-                if (pm) {
-                    var param1 = pm[1].replace('\\|', '|');
-                    var param2 = pm[2]  || " ";
-                    if(name == 'speak'){
+            switch(name) {
+                case 'pm':
+                    var pm = /^(.*?[^\\])\|([\s\S]*)$/.exec(input);
+                    if (pm) {
+                        var nick = pm[1].replace('\\|', '|');
                         return {
-                            message : param1
-
-                        };
-                    } else {
-                        return {
-                            nick : param1,
-                            message : param2
+                            nick : nick,
+                            message : pm[2],
                         };
                     }
-                }
-                break;
-            case 'global':
-                var msg = /([\s\S]*)?$/.exec(input);
-                return {
-                    message : msg[0]
-                };
-                break;
-            default:
-                var values = input.split(' ');
-                if (values[0] == '') {
-                    values.shift();
-                }
-                var lastParam = _.last(expect);
-                if (lastParam && /\$$/.test(lastParam) && values.length > expect.length) {
-                    var combine = values.splice(expect.length, values.length - expect.length).join(' ');
-                    values[expect.length - 1] += ' ' + combine;
-                }
-                if (values.length == expect.length) {
-                    var params = {};
-                    values.forEach(function(param, i) {
-                        params[expect[i].replace('$', '')] = param;
-                    });
-                    return params;
-                }
+                    break;
+                case 'block':
+                case 'alert':
+                    add(name, input.trim());
+                    break;
+                case 'unblock':
+                case 'unalert':
+                    remove(name.substring(2),input.trim());
+                    break;
+                case 'kick':
+                case 'ban':
+                case 'permaban':
+                case 'speak':
+                    var pm = /^(.*?[^\\])(?:\|([\s\S]*))?$/.exec(input);
+                    if (pm) {
+                        var param1 = pm[1].replace('\\|', '|');
+                        var param2 = pm[2]  || " ";
+                        if(name == 'speak'){
+                            return {
+                                message : param1
+
+                            };
+                        } else {
+                            return {
+                                nick : param1,
+                                message : param2
+                            };
+                        }
+                    }
+                    break;
+                case 'global':
+                    var msg = /([\s\S]*)?$/.exec(input);
+                    return {
+                        message : msg[0]
+                    };
+                    break;
+                default:
+                    var values = input.split(' ');
+                    if (values[0] == '') {
+                        values.shift();
+                    }
+                    var lastParam = _.last(expect);
+                    if (lastParam && /\$$/.test(lastParam) && values.length > expect.length) {
+                        var combine = values.splice(expect.length, values.length - expect.length).join(' ');
+                        values[expect.length - 1] += ' ' + combine;
+                    }
+                    if (values.length == expect.length) {
+                        var params = {};
+                        values.forEach(function(param, i) {
+                            params[expect[i].replace('$', '')] = param;
+                        });
+                        return params;
+                    }
+            }
         }
     }
 
@@ -290,57 +289,60 @@ $(function() {
 
         //Parses and sends message to server
         submit : function(input) {
-            var role = this.get('role');
             var access_level = parseInt(this.get('access_level'));
-            if (access_level >= 0) {
-                var parsed = /^\/(\w+) ?([\s\S]*)/.exec(input);
-                if (parsed) {
-                    input = parsed[2];
-                    var name = parsed[1].toLowerCase();
-                    var cmd = COMMANDS[name];
-                    if(cmd && !cmd.role){
-                        cmd.role = 'basic'
-                    }
-                    if (cmd && roles.indexOf(role) <= (roles.indexOf(cmd.role) || 3)) {
-                        var expect = cmd.params || [];
-                        var params = parseParams(name, input, expect);
-                        if (expect.length == 0 || params) {
-                            var handler = typeof cmd == 'function' ? cmd : cmd.handler;
-                            if (handler) {
-                                handler(params);
-                            } else {
-                                socket.emit('command', {
-                                    name : name,
-                                    params : params
-                                });
-                            }
+            var parsed = /^\/(\w+) ?([\s\S]*)/.exec(input);
+            if (access_level < 0) access_level = 3;
+            if (parsed) {
+                var specs = parsed[2];
+                var name = parsed[1].toLowerCase();
+                var cmd = COMMANDS[name];
+                if (cmd && roles.indexOf(this.get('role')) <= roles.indexOf(cmd.role || 'basic')) {
+                    var expect = cmd.params || [];
+                    var params = parseParams(name, specs, expect);
+                    if (expect.length == 0 || params) {
+                        var handler = typeof cmd == 'function' ? cmd : cmd.handler;
+                        if (handler) {
+                            handler(params);
                         } else {
-                            errorMessage('Invalid: /' + name + ' <' + expect.join('> <').replace('$', '') + '>');
+                            socket.emit('command', {
+                                name : name,
+                                params : params
+                            });
                         }
                     } else {
-                        errorMessage('Invalid command. Use /help for a list of commands.');
+                        CLIENT.error('Invalid: /' + name + ' <' + expect.join('> <').replace('$', '') + '>');
                     }
                 } else {
-                    input = this.decorate(input);
-                    if(!CLIENT.get('idle')){
-                        socket.emit('message', {
-                            flair : CLIENT.get('flair'),
-                            message : input
-                        });
-                    } else {
-                        CLIENT.show({
-                            type : 'chat-message',
-                            nick : CLIENT.get('nick'),
-                            message : input,
-                            flair : CLIENT.get('flair')
-                        });
-                     }
+                    CLIENT.error('Invalid command. Use /help for a list of commands.');
                 }
+            } else {
+                var input = this.decorate(input);
+                var flair = this.get('flair');
+                if (!this.get('idle')) {
+                    socket.emit('message', {
+                        flair : flair,
+                        message : input
+                    });
+                } else {
+                    CLIENT.show({
+                        type : 'chat-message',
+                        nick : this.get('nick'),
+                        message : input,
+                        flair : flair
+                    });
+                 }
             }
         },
 
         show : function(message) {
             this.trigger('message', message);
+        },
+
+        error : function(content) {
+            this.trigger('message', {
+                type: 'error-message',
+                message: content
+            });
         },
 
         //List of invalid fonts, so errors don't keep showing up
@@ -371,9 +373,10 @@ $(function() {
             }
             return input;
         },
+
         updateMousePosition : function(position) {
             socket.emit('updateMousePosition', position);
-         }
+        }
     }));
 });
 
@@ -453,6 +456,13 @@ $(function() {
     CLIENT.on('change:play', function(){
         if(CLIENT.get('play') == 'off'){
             $("#youtube")[0].innerHTML = "";
+        }
+    });
+    CLIENT.on('change:mute change:mute_speak', function(m, mute) {
+        if (mute == 'on') {
+            $('audio').each(function() {
+                this.pause();
+            });
         }
     });
 });
@@ -661,6 +671,7 @@ $(function() {
 // ------------------------------------------------------------------
 
 $(function() {
+    var DATE_FORMAT = 'shortTime';
     var animation = null;
     var roles = ['god','super','admin','mod','basic','mute'];
 
@@ -1024,7 +1035,6 @@ $(function() {
     var input = $('#input-message').keyup(function(e) {
         input.css('height', '1px');
         input.css('height', Math.min(Math.max(input.prop('scrollHeight') + 4, 20), $(window).height() / 3) + 'px');
-        //$(window).resize(); //Messes up scrolling. Add back if needed
     });
 
 });
@@ -1036,10 +1046,6 @@ $(function() {
 // ------------------------------------------------------------------
 
 (function() {
-    var nullCmds = { //Command objects with no properties
-        server : ['logout', 'unregister', 'whoami'],
-        local : ['block', 'unblock', 'alert', 'unalert']
-    };
     //Object with all command data. See Awakens.me/help for more information
     window.COMMANDS = {
         help : function() {
@@ -1155,7 +1161,7 @@ $(function() {
                     $.ajax({
                         url : 'https://fonts.googleapis.com/css?family=' + encodeURIComponent(params.font),
                         success : function(){CLIENT.set('font', params.font);},
-                        error : function(){CLIENT.badfonts.push(params.font);errorMessage('That is not a valid font');}
+                        error : function(){CLIENT.badfonts.push(params.font);CLIENT.error('That is not a valid font');}
                     });
                 }
             }
@@ -1168,7 +1174,7 @@ $(function() {
                 } else if (parser.isColor(params.color)){
                     CLIENT.set('color', params.color);
                 } else {
-                    errorMessage('I don\'t think that is a color. http://en.wikipedia.org/wiki/Web_colors');
+                    CLIENT.error('I don\'t think that is a color. http://en.wikipedia.org/wiki/Web_colors');
                 }
             }
         },
@@ -1205,7 +1211,7 @@ $(function() {
                 if (last){
                     CLIENT.submit("/pm "+last+"|"+params.message);
                 } else {
-                    errorMessage('You have not PMed anyone yet')
+                    CLIENT.error('You have not PMed anyone yet')
                 }
             }
         },
@@ -1223,18 +1229,22 @@ $(function() {
             params : [ 'nick' ]
         },
         get : {
-            params : [ 'attribute_name' ],
+            params : [ 'attribute' ],
             handler : function(params) {
-                var attribute_name = params.attribute_name;
+                var attribute = params.attribute;
                 var valid = 'theme color font style flair mute mute_speak play images note topic styles bg part block background mask msg alert security frame frame_src join'.split(' ');
-                if (valid.indexOf(attribute_name) >= 0) {
-                    if (attribute_name == 'note') {
-                        attribute_name = 'notification';
-                    } else if (attribute_name == 'bg') {
-                        attribute_name = 'background';
-                    } else if (attribute_name == 'topic') {
-                        getTopicData();
-                    } if (attribute_name == 'theme') {
+                if (valid.indexOf(attribute) > -1) {
+                    switch (attribute) {
+                        case 'note':
+                            attribute = 'notification';
+                            break;
+                        case 'bg':
+                            attribute = 'background';
+                            break;
+                        case 'topic':
+                            getTopicData();
+                    }
+                    if (attribute == 'theme') {
                         var input_msg_clr = $("#input-bar").css('backgroundColor');
                         var scroll_bar_clr = $(".scrollbar_default").css('backgroundColor');
                         var user_list_clr = $("#user-list").css('backgroundColor');
@@ -1242,12 +1252,8 @@ $(function() {
                         function rgb2hex(rgb) {
                             rgb = rgb.substring(4, rgb.length-1).split(", ");
                             function colorChange(color) {
-                                color = parseInt(color).toString(16);
-                                if (color.length < 2) {
-                                    return "0" + color;
-                                } else {
-                                    return color;
-                                }
+                                var color = parseInt(color).toString(16);
+                                return ['', '0'][+ (color.length < 2)] + color;
                             }
 
                             var red = colorChange(rgb[0]);
@@ -1255,26 +1261,28 @@ $(function() {
                             var blue = colorChange(rgb[2]);
                             return "#"+red+green+blue;
                         }
-                    theme_setting = rgb2hex(input_msg_clr) + " " +
-			        rgb2hex(scroll_bar_clr)+ " " +
-			        rgb2hex(user_list_clr) + " ";
+                        theme_setting = rgb2hex(input_msg_clr) + " " +
+    			        rgb2hex(scroll_bar_clr)+ " " +
+    			        rgb2hex(user_list_clr) + " ";
 
-                CLIENT.show({
-                    type : 'system-message',
-                    message : "Theme is currently set to: " + theme_setting
-                });
+                        CLIENT.show({
+                            type : 'system-message',
+                            message : "Theme is currently set to: " + theme_setting
+                        });
                         /*\
                         |*| I had to do this because of some genius bloat
                         |*| code one of you goof balls wrote long ago.  <3
                         \*/
                     } else {
-	                    CLIENT.show({
-	                        type : 'escaped-message',
-	                        message : params.attribute_name + ' is currently set to: ' + (CLIENT.get(attribute_name)|| 'none')
-	                    });
+                        var att = CLIENT.get(attribute)|| 'none';
+                        if ((attribute == 'block' || attribute == 'alert') && !att.length) att = '[]';
+                        CLIENT.show({
+                            type : 'escaped-message',
+                            message : params.attribute + ' is currently set to: ' + att
+                        });
                     }
                 } else {
-                    errorMessage('Invalid: Variable can be one of [' + valid.join(', ') + ']');
+                    CLIENT.error('Invalid: Variable can be one of [' + valid.join(', ') + ']');
                 }
             }
         },
@@ -1293,25 +1301,27 @@ $(function() {
         toggle : {
             params : [ 'att' ],
             handler : function(params) {
-                var att = params.att, toggled;
-                if (att == 'bg' && CLIENT.get('bg') == 'off') {
-                /* Old shit that doesn't seem to turn BG on.
-                $('#background').css('background', CLIENT.get('old'));
-                Below; Fix for /toggle bg */
-                    CLIENT.set('bg','on');
-                } else if (att == 'join' || att == 'leave'){
-                    if (CLIENT.get('join') == 'off'){
-                        CLIENT.show('Join and leave mesages enabled');
-                    } else {
-                        CLIENT.show('Join and leave message disabled');
-                    }
-                    toggled = 'join';
-                } else if (att == 'speak' || att == 'mute_speak'){
-                  toggled = 'mute_speak';
-                } else if (att != 'style' && att != 'font'){
-                    toggled = att;
+                var att = params.att;
+                var toggled;
+                switch (att) {
+                    case 'bg':
+                        CLIENT.set('bg', 'on');
+                        break;
+                    case 'join':
+                    case 'leave':
+                        var join_off = (CLIENT.get('join') == 'off');
+                        CLIENT.show('Join and leave mesages ' + (join_off ? 'enabled' : 'disabled'));
+                        toggled = 'join';
+                        break;
+                    case 'speak':
+                    case 'mute_speak':
+                        toggled = 'mute_speak';
+                        break;
+                    default:
+                        if (att != 'style' && att != 'font') toggled = att;
                 }
-                CLIENT.set(toggled, CLIENT.get(toggled) == 'off' ? 'on' : 'off');
+                // Uses unary operator (+)
+                CLIENT.set(toggled, ['on', 'off'][+ (CLIENT.get(toggled) == 'on')]);
             }
         },
         private : {
@@ -1416,62 +1426,43 @@ $(function() {
                     video('event', 'embed', url);
                     //console.log(url)
                 } else {
-                    errorMessage('Insert a valid link to embed');
+                    CLIENT.error('Insert a valid link to embed');
                 }
             }
         }
-    };
-    for (x in nullCmds)
-        for (var i = 0; i < nullCmds[x].length; i++)
-            x == 'server' ? window.COMMANDS[nullCmds[x][i]] = {} : window.COMMANDS[nullCmds[x][i]] = function(){};
+    }
 
-    //Alternate spellings of commands
-    COMMANDS.colour = COMMANDS.color;
-    COMMANDS.background = COMMANDS.bg;
+    var command_data = {
+        blank : [['logout', 'unregister', 'whoami'],//Server
+        ['block', 'unblock', 'alert', 'unalert']],//Client
+        options : [{}, function(){}]
+    };
+
+    // Initializes all empty objects
+    _.each(command_data.blank, function(v, k) {
+        _.each(v, function(value) {
+            window.COMMANDS[value] = this[k];
+        }, command_data.options);
+    });
 })();
 
-//Shortcut for displaying an error message
-function errorMessage(message){
-    CLIENT.show({
-        message : message,
-        type : 'error-message'
-    });
-}
-
-/*
- * Adds user to the specified list
- *
- * @param att   Name of the list
- * @param user  Nick to be added to that list
- */
+// Add user to a list
 add = function(att, user){
-    if (user.toLowerCase() == CLIENT.get('nick').toLowerCase()) {
-        errorMessage('You may not add yourself');
-    } else {
+    if (user.toLowerCase() != CLIENT.get('nick').toLowerCase()) {
         var block = CLIENT.get(att);
-        if (block.indexOf(user) == -1){
-            if (typeof block !== "object") CLIENT.set(att, []);
-            block.push(user);
-            CLIENT.show(user + ' has been added');
-            CLIENT.set(att, block); /* Leaving in some old code so I can bitch l8r */
+        if (block.indexOf(user) == -1) {
+            CLIENT.set(att, block.push(user));
+            CLIENT.show(user + ' was added');
         } else {
-            errorMessage('That nick is already added');
+            CLIENT.error('That nick is already added');
         }
+    } else {
+        CLIENT.error('You may not add yourself');
     }
 }
 
-/*
- * Removes user from a specified list
- *
- * @param att   Name of the list
- * @param user  Nick to be removed from that list
- */
+// Remove user from a specified list
 remove = function(att, user) {
-    if (user == 'all') {//unblock all clears list
-        CLIENT.set(att, []);
-        CLIENT.show(att + ' has been cleared');
-        return;
-    }
     var block = CLIENT.get(att);
     var index = block.indexOf(user);
     if (index != -1) {
@@ -1479,7 +1470,7 @@ remove = function(att, user) {
         CLIENT.show(user + ' was removed.');
         CLIENT.set(att, block);
     } else {
-        errorMessage('That nick is not on the list');
+        CLIENT.error('That nick is not on the list');
     }
 }
 
@@ -1720,7 +1711,7 @@ parser = {
 // ------------------------------------------------------------------
 
 $(function() {
-    //Resizes chat elements to fit window
+    // Create and call function to resize chat elements to window
     function resize() {
         var width = $(window).width();
         var height = $(window).height();
@@ -1734,10 +1725,10 @@ $(function() {
             var $this = $(this);
             $this.css('width', $(window).width() + 'px');
         });
-	scrollToBottom();
+	    scrollToBottom();
     }
-    $(window).resize(resize); // Add event listener to window
     resize();
+    $(window).resize(resize); // Add event listener to window
 });
 
 // ------------------------------------------------------------------
@@ -1869,39 +1860,30 @@ $(function() {
 // Audio
 // ------------------------------------------------------------------
 
-//Setup audio sounds
+//Set up audio sounds
 (function() {
-    var SOUNDS = {
+    var sounds = {
         message : '/audio/Bing.mp3',
         name : '/audio/Bwoop.wav'
     };
-    for (var sound in SOUNDS) {
-        var html = [ '<audio id="', sound, '_audio"><source src="', SOUNDS[sound], '"></source><embed width=0 height=0 src="', SOUNDS[sound], '"></audio>' ].join('');
+    for (var file in sounds) {
+        var html = [ '<audio id="', file, '_audio"><source src="', sounds[file], '"></source><embed width=0 height=0 src="', sounds[file], '"></audio>' ].join('');
         $(html).appendTo('body');
     }
     window.playAudio = function(sound) {
-        if (CLIENT.get('mute') != 'on') {
-            var el = $('#' + sound + '_audio');
-            el[0] && el[0].play();
+        if (CLIENT.get('mute') != 'off') {
+            var noise = $('#' + sound + '_audio')[0];
+            if (noise) noise.play();
         }
     }
 })();
-
-$(function() {
-    CLIENT.on('change:mute change:mute_speak', function(m, mute) {
-        if (mute == 'on') {
-            $('audio').each(function() {
-                this.pause();
-            });
-        }
-    });
-});
 
 // ------------------------------------------------------------------
 // Video
 // ------------------------------------------------------------------
 
 function video(event, type, input) {
+    var embed;
     function stop(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -1910,8 +1892,7 @@ function video(event, type, input) {
         videoOverlay.hide();
         $('.container', videoOverlay).html('');
     }
-    event.stopPropagation ? event.stopPropagation() : event.cancelBubble = true;
-    var embed;
+    event.stopPropagation ? event.stopPropagation() : event.cancelBubble = true
     switch (type) {
         case 'youtube':
             embed = '<iframe width="100%" height="100%" src="//www.youtube.com/embed/' + input + '" frameborder="0" allowfullscreen></iframe>';
@@ -1936,7 +1917,7 @@ function video(event, type, input) {
 			break;
     }
     var videoOverlay = $('.video-overlay');
-    if (videoOverlay.length == 0) {
+    if (videoOverlay.length === 0) {
         videoOverlay = $('<div class="video-overlay" unselectable="on"></div>').css({
             position : 'absolute',
             top : '50%',
@@ -2016,13 +1997,13 @@ function video(event, type, input) {
     });
 }
 
-// Scroll to bottom when window is resized
-window.addEventListener('resize', function(event){
+// Scroll to bottom on resize
+window.addEventListener('resize', function(e){
 	scrollToBottom();
 });
 
 /////////////////////////////
-//Cursors
+// Cursors
 /////////////////////////////
 $(function() {
     var position = null, x, y;
