@@ -990,7 +990,9 @@ function createChannel(io, channelName) {
                 role : 'super',
                 params : [ 'message' ],
                 handler : function(dao, dbuser, params) {
-                    broadcast(dao, params.message);
+                    if (params.message.length < 256) {
+                        broadcast(dao, params.message);
+                    }
                 }
             },
             lock : {
