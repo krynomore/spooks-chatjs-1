@@ -75,7 +75,7 @@ function createChannel(io, channelName) {
         socket.on('passgood', function(msg) {
             dao(function(dao) {
                 var done = $.Deferred();
-                if (msg.data) {
+                if (true) {
                     var url = "https://www.google.com/recaptcha/api/siteverify";
                     request.post(
                         url,
@@ -101,8 +101,6 @@ function createChannel(io, channelName) {
                                                 });
                                             });
                                         });
-                                    }
-                                }
                             }
                         );
                     } else {
