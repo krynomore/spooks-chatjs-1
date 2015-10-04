@@ -20,7 +20,7 @@ $(function() {
         if (CLIENT.get('join') == 'on') {
             CLIENT.show({
                 type : 'general-message',
-                message : user.nick + ' joined '
+                message : user.nick + ' has joined '
             });
         }
 
@@ -71,7 +71,7 @@ $(function() {
         if (!user.kicked && CLIENT.get('join') == 'on') {
             CLIENT.show({
                 type : 'general-message',
-                message : user.nick + ' left ' + (user.part ? ': ' + user.part : '')
+                message : user.nick + ' has left ' + (user.part ? user.part : '')
             });
         }
     });
