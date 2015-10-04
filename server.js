@@ -974,6 +974,10 @@ function createChannel(io, channelName) {
                 handler : function(dao, dbuser, params) {
                     if (params.message.length < 256) {
                         broadcast(dao, params.message);
+                    } else {
+                        messag = params.message;
+                        croppedMessage = messag.substring(0, 256);
+                        broadcast(dao, croppedMessage);
                     }
                 }
             },
