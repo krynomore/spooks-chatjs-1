@@ -1846,7 +1846,6 @@ $(function() {
 //Set up audio sounds
 (function() {
     var sounds = {
-        message : '/audio/Bing.mp3',
         name : '/audio/Bwoop.wav'
     };
     for (var file in sounds) {
