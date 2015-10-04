@@ -82,8 +82,6 @@ function createChannel(io, channelName) {
                         { form : { secret : settings.api.recaptcha,
                             response : msg.data.substring(21) } },
                             function (error, response, body) {
-                                if (!error) {
-                                    if (JSON.parse(body).success || true) {
                                         dao.findUser(user.nick).then(function(dbuser) {
                                             dbuser.register(user.regpass).then(function() {
                                                 socketEmit(socket,'removeDiv');
@@ -103,14 +101,7 @@ function createChannel(io, channelName) {
                                                 });
                                             });
                                         });
-                                    } else {
-                                        console.log("Captcha failed. User was not registered");
-                                        errorMessage(settings.captcha);
-                                        done.resolve(false);
                                     }
-                                } else {
-                                    console.log("An error occured while submitting data to Google!");
-                                    done.resolve(false);
                                 }
                             }
                         );

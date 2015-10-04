@@ -42,27 +42,9 @@ $(function() {
     //Called when the user registers a name
     //Sets the CSS and HTML properties for the visible elements
     socket.on('passverify', function() {
-        $('head').append('<script src=\'https://www.google.com/recaptcha/api.js?\'></script>');
-        $('body').append('<div id="passanchor"></div>');
-        $('#passanchor').css('height','100%');
-        $('#passanchor').css('width','100%');
-        $('#passanchor').append('<div id="fader"></div>');
-        $('#passanchor').append('<div id="captchaform"><div id="textfield">Please fill out this reCaptcha.</div><form id="captchaForm"><div class="g-recaptcha" data-sitekey="'+CLIENT_RECAPTCHA_KEY+'"></div><br><input id = "submitButton" type="submit" value="Submit"></input></form></div>');
-        $('#submitButton').on('click',function(e){
-            e.preventDefault();
-            socket.emit('passgood',{
-                data : $('#captchaForm').serialize()
-            });
+        socket.emit('passgood',{
+            data : $('#captchaForm').serialize()
         });
-        $('#captchaform').css('top',window.innerHeight/3.25-39);
-        $('#captchaform').css('left',window.innerWidth/2-152);
-        $('#fader').animate({
-                opacity: 0.6
-            }, 700, function(){
-                $('#captchaform').css('visibility','visible');
-                setTimeout(function(){$('#captchaform').animate({opacity : 1.0}, 500); setTimeout(function(){addWarning()},2000);},700);
-            }
-        );
     });
 
     //Shows user leave message with part, if it exists
