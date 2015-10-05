@@ -34,18 +34,6 @@ $(function() {
         ONLINE.add(users);
     });
 
-    //Removes user registration window
-    socket.on('removeDiv',function() {
-        $('#passanchor').hide(500,function(){$('#passanchor').remove()});
-    });
-
-    //Called when the user registers a name
-    socket.on('passverify', function() {
-        socket.emit('passgood',{
-            data : $('#captchaForm').serialize()
-        });
-    });
-
     //Shows user leave message with part, if it exists
     socket.on('left', function(user) {
         ONLINE.remove(user.id);
