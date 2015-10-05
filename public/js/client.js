@@ -1429,7 +1429,8 @@ add = function(att, user){
         var block = CLIENT.get(att);
         if (typeof block !== "object") { x = [] }
         if (block.indexOf(user) == -1) {
-            CLIENT.set(att, block.push(user));
+            block.push(user);
+            CLIENT.set(att, block);
             CLIENT.show(user + ' was added');
         } else {
             CLIENT.error('That nick is already added');
