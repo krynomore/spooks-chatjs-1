@@ -67,7 +67,7 @@ $(function() {
 
     //Updates the large center 'message'
     socket.on('centermsg', function(data) {
-        CLIENT.set('msg', parser.parse(data.msg));
+        CLIENT.set('msg', data.msg);
     });
 
     //Client side check to see if user is active
@@ -387,7 +387,7 @@ $(function() {
         }
     });
     CLIENT.on('change:msg', function(m, msg){
-        $('#content').text(msg);
+        $('#content').html(parser.parse(msg));
     });
     //Show notification when it is updated
     CLIENT.on('change:notification', function(m, notification) {
