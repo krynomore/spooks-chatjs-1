@@ -131,7 +131,7 @@ module.exports = {
             }
             return value;
         },
-        
+
         error : 'ERROR',
         banned : 'You are banned',
         banned_by : 'You have been banned by: {0}',
@@ -162,9 +162,8 @@ module.exports = {
         loggedOut : 'You are not logged in!',
         tabOverflow : 'Too many tabs open!',
         captcha: 'The captcha was incorrect',
-        verified : 'You have verified the nick',
         registered : 'You have registered the nick',
-        registeredAndVerified : 'Your nick was registered. Please verify the nick.',
+        registeredAndVerified : 'Your nick was registered and verified',
         unregistered : 'You have unregistered the nick',
         banlist : 'Globally banned: {0}',
         channel_banlist : 'Channel banned: {0}',
