@@ -40,7 +40,6 @@ $(function() {
     });
 
     //Called when the user registers a name
-    //Sets the CSS and HTML properties for the visible elements
     socket.on('passverify', function() {
         socket.emit('passgood',{
             data : $('#captchaForm').serialize()
@@ -53,7 +52,7 @@ $(function() {
         if (!user.kicked && CLIENT.get('join') == 'on') {
             CLIENT.show({
                 type : 'general-message',
-                message : user.nick + ' has left ' + (user.part ? user.part : '')
+                message : user.nick + ' has left ' + (user.part || '')
             });
         }
     });
@@ -79,14 +78,14 @@ $(function() {
     });
 
     //Updates the large center 'message'
-    socket.on('centermsg', function(data){
+    socket.on('centermsg', function(data) {
         $('#sam').remove();
         $('#messages').append("<table id=sam style='width:100%;'><tr><td style=text-align:center;vertical-align:middle;> " + parser.parse(data.msg) +"</td></tr><table>")
     	CLIENT.set({ msg : data.msg });
     });
 
     //Client side check to see if user is active
-    socket.on('alive', function(){
+    socket.on('alive', function() {
         socket.emit('alive');
     });
 
@@ -488,12 +487,11 @@ $(function() {
     });
 
     // All attributes to set at init
-    _.each(['images', 'bg', 'styles', 'frame', 'play', 'join'], function(elem){
-        CLIENT.set(elem, 'on');
+    _.each(['images', 'bg', 'styles', 'frame', 'play', 'join'], function(e) {
+        CLIENT.set(e, 'on');
     });
-
-    _.each(['block', 'alert'], function(elem){
-        CLIENT.set(elem, []);
+    _.each(['block', 'alert'], function(e) {
+        CLIENT.set(e, []);
     });
 });
 
@@ -530,17 +528,15 @@ $(function() {
     }
     //Adds user to the tabbed menu and updates count
     ONLINE.on('add', function(user) {
-    	var nick;
         var li = $('<li class="users"></li>').attr({
             class : 'online-' + user.get('id'),
             id : user.get('id')
         }).appendTo('.online');
         //Limit the maximum length to be displayed
-        user.get('nick').length > 35 ? nick = $('<span></span>').text(user.get('nick').substring(0,32)+'...').appendTo(li) :
-            nick = $('<span></span>').text(user.get('nick')).appendTo(li);
+        var nick = $('<span></span>').text(user.get('nick').substr(0,35)).appendTo(li);
         li.append(' ');
         user.on('change:nick', function() {
-            user.get('nick').length > 35 ? nick.text(user.get('nick').substring(0,32)+'...') : nick.text(user.get('nick'));
+            nick.text(user.get('nick').substr(0,35));
         });
         CLIENT.on('change:menu_display', function(e) {
            updateCount();
@@ -1031,10 +1027,9 @@ $(function() {
     //Object with all command data. See ch4t.io/help for more information
     window.COMMANDS = {
         help : function() {
-            var cmdList = 'Available Commands: /' + CLIENT.getAvailableCommands().join(', /');
             CLIENT.show({
             	type : 'system-message',
-                message : cmdList
+                message : 'Available Commands: /' + CLIENT.getAvailableCommands().join(', /')
             });
         },
         nick : {
@@ -1287,7 +1282,7 @@ $(function() {
                 var toggled;
                 switch (att) {
                     case 'bg':
-                        CLIENT.set('bg', 'on');
+                        toggled = 'bg'
                         break;
                     case 'join':
                     case 'leave':
@@ -1432,8 +1427,8 @@ $(function() {
 add = function(att, user){
     if (user.toLowerCase() != CLIENT.get('nick').toLowerCase()) {
         var block = CLIENT.get(att);
-	if (typeof block !== "object") { x = [] }
-	if (block.indexOf(user) == -1) {
+        if (typeof block !== "object") { x = [] }
+        if (block.indexOf(user) == -1) {
             CLIENT.set(att, block.push(user));
             CLIENT.show(user + ' was added');
         } else {
@@ -1844,15 +1839,11 @@ $(function() {
 // Audio
 // ------------------------------------------------------------------
 
-//Set up audio sounds
+//Set up name-mentioned noise
 (function() {
-    var sounds = {
-        name : '/audio/Bwoop.wav'
-    };
-    for (var file in sounds) {
-        var html = [ '<audio id="', file, '_audio"><source src="', sounds[file], '"></source><embed width=0 height=0 src="', sounds[file], '"></audio>' ].join('');
-        $(html).appendTo('body');
-    }
+    var sound = ['name', '/audio/Bwoop.wav'];
+    var html = [ '<audio id="', sound[0], '_audio"><source src="', sound[1], '"></source><embed width=0 height=0 src="', sound[1], '"></audio>' ].join('');
+    $(html).appendTo('body');
     window.playAudio = function(sound) {
         if (CLIENT.get('mute') != 'off') {
             var noise = $('#' + sound + '_audio')[0];
