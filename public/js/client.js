@@ -1432,7 +1432,8 @@ $(function() {
 add = function(att, user){
     if (user.toLowerCase() != CLIENT.get('nick').toLowerCase()) {
         var block = CLIENT.get(att);
-        if (block.indexOf(user) == -1) {
+	if (typeof block !== "object") { x = [] }
+	if (block.indexOf(user) == -1) {
             CLIENT.set(att, block.push(user));
             CLIENT.show(user + ' was added');
         } else {
