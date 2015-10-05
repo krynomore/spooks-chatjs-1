@@ -70,47 +70,12 @@ function createChannel(io, channelName) {
         if (user.remote_addr.substring(0,7) == '::ffff:') {
             user.remote_addr = user.remote_addr.substring(7,user.remote_addr.length);
         }
-        
+
         //Get registered
         socket.on('passgood', function(msg) {
-            dao(function(dao) {
-                var done = $.Deferred();
-                if (true) {
-                    var url = "https://www.google.com/recaptcha/api/siteverify";
-                    request.post(
-                        url,
-                        { form : { secret : settings.api.recaptcha,
-                            response : msg.data.substring(21) } },
-                            function (error, response, body) {
-                                        dao.findUser(user.nick).then(function(dbuser) {
-                                            dbuser.register(user.regpass).then(function() {
-                                                socketEmit(socket,'removeDiv');
-                                                chnl = dbuser.get('nick') + '.forgetme.ml/';
-                                                access = {};
-                                                whitelist = {};
-                                                access[dbuser.get('nick')] = {"role":"admin","access_level":"0"};
-                                                whitelist[dbuser.get('nick')] = {'remote_addr':dbuser.get('remote_addr')};
-                                                dao.setChannelInfo(chnl, 'whitelist', whitelist);
-                                                return dao.setChannelInfo(chnl, 'access', JSON.stringify(access)).then(function() {
-                                                    user.login = true;
-                                                    socketEmit(socket, 'update', {
-                                                        login : true
-                                                    });
-                                                    showMessage(msgs.verified);
-                                                    delete user.regpass;
-                                                });
-                                            });
-                                        });
-                            }
-                        );
-                    } else {
-                        console.log("Invalid form data.");
-                        done.resolve(false);
-                    }
-                    return done.promise();
-            });
+
         });
-        
+
         //Set Users Part
         socket.on('SetPart', function(parts) {
             user.part = parts.toString();
@@ -241,15 +206,31 @@ function createChannel(io, channelName) {
                 handler : function(dao, dbuser, params) {
                     dao.findUser(user.nick).then(function(dbuser) {
                         if (!(settings.api || settings.api.recaptcha)) {
-                            console.log("The API key for recaptcha is missing.");
+                            console.log('Could not register user due to missing API key.');
                         }
                         if (!dbuser) {
                             dao.createUser(user.nick, user.remote_addr).done(function() {
                                 dao.findUser(user.nick).then(function(dbuser) {
-                                    user.regpass = params.initial_password;
-                                    showMessage(msgs.registeredAndVerified);
-                                    socketEmit(socket,'passverify');
                                     console.log(user.nick + ' has been registered');
+                                    // Verify user
+                                    dao.findUser(user.nick).then(function(dbuser) {
+                                        dbuser.register(params.initial_password).then(function() {
+                                            chnl = dbuser.get('nick') + '.forgetme.ml/';
+                                            console.log(chnl);
+                                            access = {};
+                                            whitelist = {};
+                                            access[dbuser.get('nick')] = {"role":"admin","access_level":"0"};
+                                            whitelist[dbuser.get('nick')] = {'remote_addr':dbuser.get('remote_addr')};
+                                            dao.setChannelInfo(chnl, 'whitelist', whitelist);
+                                            return dao.setChannelInfo(chnl, 'access', JSON.stringify(access)).then(function() {
+                                                user.login = true;
+                                                socketEmit(socket, 'update', {
+                                                    login : true
+                                                });
+                                                showMessage(msgs.registeredAndVerified);
+                                            });
+                                        });
+                                    });
                                 });
                             });
                         } else {
@@ -1090,12 +1071,12 @@ function createChannel(io, channelName) {
                         type : 'action-message',
                         message : user.nick + ' called for a coinflip!',
                     });
-                    
+
                     if (Math.random() < 0.5) {
                         bot_send("#yellow\Heads.", true, true);
                     } else {
                         bot_send("#yellow\Tails.", true, true);
-                    }  
+                    }
                 }
             },
             hat : {
@@ -1155,7 +1136,7 @@ function createChannel(io, channelName) {
                                     socketEmit(channel.online[index].socket, 'message', 'You now have access to hat: ' + params.hat);
                                 } else {
                                     errorMessage('User already has that hat.');
-                                }  
+                                }
                             } else {
                                 errorMessage('User must be registered.');
                             }
@@ -1247,7 +1228,7 @@ function createChannel(io, channelName) {
                 }
                 return $.Deferred().resolve(true);
             },
-            
+
             join : function(dao, msg) {
                 user.tabs = 0;
                 if (channel.online.length > 0) {
@@ -1545,7 +1526,7 @@ function createChannel(io, channelName) {
                 return done.promise();
             }
 
-            /*Disabled until properly transferred to the Client.JS 
+            /*Disabled until properly transferred to the Client.JS
             function getTitle(url) {
                 request(url, function (error, response, body) {
                     if (!error && response.statusCode == 200) {
@@ -1575,9 +1556,9 @@ function createChannel(io, channelName) {
                 }
             }
             */
-            
+
             /*
-                       
+
             /**
             * @inner
             * @param {Socket} socket
@@ -1937,14 +1918,14 @@ function createChannel(io, channelName) {
 
                 return done.promise();
             }
-            
+
             // -----------------------------------------------------------------------------
             // AwksBot
             // -----------------------------------------------------------------------------
 
             /* Basic Set up and customization to Emit Bot Messages
              The allow_colors parameter can be ommited, it defaults to false. */
-             
+
             var escape_regex = /(\/[~?^&+%*]|\$|\\)/gi;
             var http_regex = /https*:\/\//gi;
             function bot_send(msg, isSafe, allow_colors) {
@@ -1977,15 +1958,15 @@ function createChannel(io, channelName) {
                     };
                     socket && socketEmit(toSocket, 'message', message);
                 }
-            } 
-            
+            }
+
             /* Inner Bot Functions, Required for certain Commands.*/
-            
+
             // Kills Color Codes.
             function remove_colors(str) {
                 return str.replace(/#/g, "\\#");
-            }  
-            
+            }
+
             //Varaibles required for the define command.
             function define(word) {
                 var options = {
@@ -2016,8 +1997,8 @@ function createChannel(io, channelName) {
                     }
                 }
 
-            }    
-            
+            }
+
         // ---------------------------------------------------------------------
         // INITIALIZE THE CLIENT
         // ---------------------------------------------------------------------
@@ -2083,7 +2064,7 @@ function initApp(app, server, https) {
                 */
 
                 //Redirects to Main Channel
-                
+
                 /*//Dev Server Redirects //Old stuff
                 if (channelName == 'www.spooks4.me') {
                     res.redirect("http://spooks4.me/");
