@@ -686,7 +686,7 @@ $(function() {
         }
         //Make quotable if relevant
         if (message.count){
-            el.append($('<div class="timestamp" title=' + message.count + '></div>').text(time.format(DATE_FORMAT) + ' '));
+            el.append($('<div class="timestamp" title=' + message.count + '></div>').text(time.format(DATE_FORMAT) + ' ' + message.count + ' '));
             content = $('<div class="message-content spooky_msg_' + message.count + '"></div>').appendTo(el);
         } else {
             el.append($('<div class="timestamp"></div>').text(time.format(DATE_FORMAT) + ' '));
