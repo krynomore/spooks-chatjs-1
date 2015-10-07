@@ -711,10 +711,11 @@ $(function() {
             }
         }
         if (message.nick) {
-            var parsedFlair = null;
+            var parsedFlair = parser.parse(message.flair);
             if (message.flair && parser.removeHTML(parsedFlair) == message.nick) {
-                parsedFlair = parser.parse(message.flair);
                 parser.getAllFonts(message.flair);
+            } else if (message.flair) {
+                parsedFlair = null;
             }
             if (message.hat != 'nohat' && message.type == 'chat-message') {
                 $('<span class="hat ' + message.hat + '" style="background:url(\'/css/img/hats/'+message.hat+'.png\') no-repeat center;background-size: 30px 30px;"></span>').appendTo(content);
