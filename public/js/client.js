@@ -10,7 +10,6 @@ ONLINE = new Backbone.Collection();
 Array.prototype.last = function(){return this[this.length-1]}
 
 $(function() {
-    var CLIENT_RECAPTCHA_KEY = "6Lcw6wcTAAAAANJlc4WS4P4uecBjcLjW7jtHrZCm";
     var socket = io('/' + window.channel);
     var roles = ['god','super','admin','mod','basic','mute'];
 
@@ -464,8 +463,7 @@ $(function() {
     // Set the theme for scrollbar and input textarea
     CLIENT.on('change:chat_style', function(m, style){
         style = CLIENT.get('chat_style').split(',');
-        if (!style[2])
-            style[2] == '#000';
+        if (!style[2]) style[2] = '#000';
         $('#input-bar').css('background-color', style[0]);
         $('#user-list').css('background-color', style[2]);
 
