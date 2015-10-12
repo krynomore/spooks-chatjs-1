@@ -216,7 +216,7 @@ function createChannel(io, channelName) {
                                     // Verify user
                                     dao.findUser(user.nick).then(function(dbuser) {
                                         dbuser.register(params.initial_password).then(function() {
-                                            chnl = dbuser.get('nick') + '.forgetme.ml/';
+                                            chnl = dbuser.get('nick') + '.ch4t.io/';
                                             console.log(chnl);
                                             access = {};
                                             whitelist = {};
@@ -2051,7 +2051,7 @@ function initApp(app, server, https) {
             try {
                 var host = req.headers.host;
                 var channelName = channelRegex.exec(req.url)[1];
-                if (host != 'forgetme.ml') {
+                if (host != 'ch4t.io') {
                     channelName = host + '/' + channelName;
                 }
                 if (!channels[channelName]) {
@@ -2083,10 +2083,10 @@ function initApp(app, server, https) {
                 } else if (channelName == 'www.2spooks4.me/') {
                     res.redirect("http://2spooks4.me/");
                 }*/
-                if (channelName == 'www.forgetme.ml') {
-                    res.redirect("http://forgetme.ml/");
-                } else if (channelName == 'www.forgetme.ml/') {
-                    res.redirect("http://forgetme.ml/");
+                if (channelName == 'www.ch4t.io') {
+                    res.redirect("http://ch4t.io/");
+                } else if (channelName == 'www.ch4t.io/') {
+                    res.redirect("http://ch4t.io/");
                 } else if (channelName == 'www.ch4t.io') {
                     res.redirect("http://ch4t.io/");
                 } else if (channelName == 'www.ch4t.io/') {

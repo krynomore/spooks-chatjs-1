@@ -18,7 +18,7 @@ module.exports = {
     },
 
     https : {
-        domain : 'forgetme.ml',
+        domain : 'ch4t.io',
         key : './ssl/myserver.key',
         cert : './ssl/server.crt',
         port : 443
@@ -102,7 +102,7 @@ module.exports = {
     },
 
     registrationEmail : {
-        from : 'Chat Server <donotreply@forgetme.ml>',
+        from : 'Chat Server <donotreply@ch4t.io>',
         subject : 'Registering Chat Nickname',
         text : 'You are registering the nickname {0}.\r\nTo verify your account, all you have to do is type out the following: /verify {1}'
     },
