@@ -1533,7 +1533,8 @@ parser = {
         //Word Filters
         str = str.replace(/awakens/gi, 'the shitty chat')
     			 .replace(/vegan/gi, 'terrorist')
-    			 .replace(/anon2000/gi, 'gaynon2000');
+    			 .replace(/anon2000/gi, 'gaynon2000')
+    			 .replace(/sushu/gi, 'a good coder');
 
         // Remove replacement codes
         str = str.replace(RegExp(this.replink, 'g'), '');
