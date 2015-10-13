@@ -353,7 +353,6 @@ $(function() {
 $(function() {
     var blurred = false;
     var unread = 0;
-    var check = new RegExp('\\b'+ CLIENT.get('nick') +'\\b',"gi");
 
     //Changes unread count
     function updateTitle() {
@@ -378,9 +377,6 @@ $(function() {
     //Updates unread status
     CLIENT.on('message', function(message) {
         if (blurred) {
-            if(message.message.search(check) != -1 || (message.type == 'personal-message' && message.nick != CLIENT.get('nick'))){
-                $("#icon").attr("href","../img/icon.ico");
-            }
             unread++;
             updateTitle();
         }
@@ -693,9 +689,11 @@ $(function() {
             el.children().first().css('font-size','0.2em');
         }
         //Alert the user if their name is mentioned
-        if ((check.test(message.message.replace('\\','')) || valid) && message.nick != CLIENT.get('nick') && ('chat-message action-message personal-message'.split(' ').indexOf(message.type) + 1)){
+        if (((check.test(message.message.replace('\\','')) || valid) && ('chat-message action-message'.split(' ').indexOf(message.type) + 1) || message.type == 'personal-message')
+            && message.nick != CLIENT.get('nick')){
             	message.count && el.children('.timestamp').attr('class', "timestamp highlightname");
             	sound = 'name'
+                $("#icon").attr("href","../img/icon.ico");
         }
         //Alert user if they are quoted
         if ((message.message.search(/>>(\d)+/g) + 1) && CLIENT.get('nick') != message.nick) {// <--- Not a typo
@@ -705,21 +703,23 @@ $(function() {
                 if (lastQuote.length && lastQuote.text().match(/[^:]*/i)[0] == CLIENT.get('nick')) {
                     message.count && el.children('.timestamp').attr('class', "timestamp highlightname");
                     sound = 'name';
+                    $("#icon").attr("href","../img/icon.ico");
                 }
             }
         }
-        if (message.nick) {
-            var parsedFlair = parser.parse(message.flair);
-            if (message.flair && parser.removeHTML(parsedFlair) == message.nick) {
-                parser.getAllFonts(message.flair);
-            } else if (message.flair) {
-                parsedFlair = null;
+        if (message.nick && message.type != 'action-message') {
+            if (message.flair) {
+                var parsedFlair = parser.parse(message.flair);
+                if (parser.removeHTML(parsedFlair) == message.nick) {
+                    parser.getAllFonts(message.flair);
+                } else {
+                    parsedFlair = null;
+                }
             }
             if (message.hat != 'nohat' && message.type == 'chat-message') {
                 $('<span class="hat ' + message.hat + '" style="background:url(\'/css/img/hats/'+message.hat+'.png\') no-repeat center;background-size: 30px 30px;"></span>').appendTo(content);
             }
-            var flair = parsedFlair || message.nick;
-            if (message.type == 'spoken-message') flair += ':';
+            var flair = (parsedFlair || message.nick) + ':';
             $('<span class="nick"></span>').html(flair).appendTo(content);
         }
         if (message.message) {
