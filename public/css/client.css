@@ -282,6 +282,8 @@ a:hover {
     bottom: 0;
     width: 100%;
     z-index: 2;
+    box-shadow: 0px 0px 10px 0px rgba(0,0,0, 0.3),
+                0px 3px 1px -3px rgba(255,255,255, 0.2) inset;
 }
 
 #input-bar > div {
@@ -298,13 +300,13 @@ a:hover {
     width: calc(100% - 34px);           /* Standard */
     resize: none;
     height: 28px;
-    border: 1px solid #0C0D0E;
+    border: none;
     border-radius: 5px;
     -moz-border-radius: 5px;
     -khtml-border-radius: 5px;
     -webkit-border-radius: 5px;
     background: #007FFF;
-    background: rgba(20, 20, 20, 0.75);
+    background: rgba(0, 0, 0, 0.5);
     color: white;
     padding-top: 4px;
     padding-bottom: 4px;
@@ -313,8 +315,8 @@ a:hover {
     font-size: 14px;
     font-family: Droid Sans, sans-serif;
     font-weight: normal;
-    box-shadow: rgba(255, 255, 255, 0.1) 0 1px 0, rgba(0, 0, 0, 0.8) 0 1px
-        7px 0px inset;
+    box-shadow: 0px 1px 0px 0px rgba(255, 255, 255, 0.1), 
+                0px 2px 10px 0px rgba(0, 0, 0, 0.4) inset;
 }
 
 #input-message:focus {
