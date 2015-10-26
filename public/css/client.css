@@ -47,11 +47,11 @@ body {
 
 #quoteDiv {
     background: #1F1F1F;
-    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 3px 0 rgba(0, 0, 0, 0.8) inset;
-    border: 1px solid #2F2F2F;
-    border-radius: 1px;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1), 
+                0px 0px 4px rgba(0,0,0, 0.5),
+                0 1px 3px 0 rgba(0,0,0, 0.8) inset;
+    border-radius: 3px;
 }
-
 #messages {
     background: #111;
     color: #FFF;
