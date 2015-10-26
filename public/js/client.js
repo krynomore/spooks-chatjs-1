@@ -108,7 +108,7 @@ $(function() {
     //Displays disconnect message... that's really all.
     socket.on('disconnect', function() {
         ONLINE.reset();
-        CLIENT.error('Disconnected');
+        CLIENT.error('Socket connection closed');
     });
 
     //Refreshes window on command
