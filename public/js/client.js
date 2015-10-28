@@ -1,18 +1,18 @@
-// ------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Client
-// ------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-// Create list of online users
-ONLINE = new Backbone.Collection();
-
-//Array shortcut [Array.last()]
+/* Array shortcut [Array.last()] */
 Array.prototype.last = function(){return this[this.length-1]}
+
+/* Make online user list */
+ONLINE = new Backbone.Collection();
 
 $(function() {
     var socket = io('/' + window.channel);
     var roles = ['god','super','admin','mod','basic','mute'];
 
-    //Add user to list and show message
+    /* Add user to list and show message */
     socket.on('join', function(user) {
         ONLINE.add(user);
         if (CLIENT.get('join') == 'on') {
@@ -27,12 +27,12 @@ $(function() {
         }
     });
 
-    //Synchronize user list with server
+    /* Synchronize user list with server */
     socket.on('online', function(users) {
         ONLINE.add(users);
     });
 
-    //Shows user leave message with part, if it exists
+    /* Show user leave message with part, if it exists */
     socket.on('left', function(user) {
         ONLINE.remove(user.id);
         if (!user.kicked && CLIENT.get('join') == 'on') {
@@ -43,7 +43,7 @@ $(function() {
         }
     });
 
-    //Triggers name change message
+    /* Trigger name change message */
     socket.on('nick', function(info) {
         var user = ONLINE.get(info.id);
         var old = user.get('nick');
@@ -54,7 +54,7 @@ $(function() {
         });
     });
 
-    //Updates user information
+    /* Update user information */
     socket.on('update', function(info) {
         if (info.role == 'mute') {
             info.role = 'basic';
@@ -63,17 +63,17 @@ $(function() {
         CLIENT.set(info);
     });
 
-    //Updates the large center 'message'
+    /* Update the large center message */
     socket.on('centermsg', function(data) {
         CLIENT.set('msg', data.msg);
     });
 
-    //Client side check to see if user is active
+    /* Client side check to see if user is active */
     socket.on('alive', function() {
         socket.emit('alive');
     });
 
-    //Plays youtube video when activated
+    /* Play youtube video when activated */
     socket.on('playvid', function(url){
         if(url.url == "stop" || CLIENT.get('mute') == 'on' || CLIENT.get('play') == 'off') {
             $("#youtube")[0].innerHTML = "";
@@ -82,7 +82,7 @@ $(function() {
         }
     });
 
-    //Shows messages from users that aren't blocked
+    /* Show messages from users that aren't blocked */
     socket.on('message', function(msg) {
         if (!msg.nick) {
             CLIENT.show(msg);
@@ -96,7 +96,7 @@ $(function() {
         }
     });
 
-    //Sends user info after connecting to the server
+    /* Send user info after connecting to the server */
     socket.on('connect', function() {
         socket.emit('join', {
             nick : CLIENT.get('nick'),
@@ -104,23 +104,23 @@ $(function() {
         });
     });
 
-    //Displays disconnect message... that's really all.
+    /* Display disconnect message */
     socket.on('disconnect', function() {
         ONLINE.reset();
         CLIENT.error('Socket connection closed');
     });
 
-    //Refreshes window on command
+    /* Refresh window on command */
     socket.on('refresh', function() {
         window.location.reload();
     });
 
-    //Sends request for topic info
+    /* Send request for topic info */
     getTopicData = function() {
         socket.emit('topicInfo');
     };
 
-    //Sends request for user's flair information
+    /* Send request for user's flair information */
     sendFlair = function(flair){
         socket.emit('command', {
             name : 'flair',
@@ -140,7 +140,7 @@ $(function() {
         if ('pm block alert unblock unalert'.split(' ').indexOf(name) != -1 && input.trim() == ""){
             CLIENT.error('Invalid: /'+name+' <nick>');
         } else {
-        //Simplified switch statement for client-side commands
+        /* Simplified switch statement for client-side commands */
             switch(name) {
                 case 'pm':
                     var pm = /^(.*?[^\\])\|([\s\S]*)$/.exec(input);
@@ -208,7 +208,7 @@ $(function() {
         }
     }
 
-    //Backbone model containing functions to manage the user chat interface
+    /* Backbone model containing functions to manage the user chat interface */
     CLIENT = new (Backbone.Model.extend({
         initialize : function() {
             /* Initialize from localstorage. */
@@ -243,7 +243,7 @@ $(function() {
             }, this);
         },
 
-        //Returns all valid commands
+        /* Return all valid commands */
         getAvailableCommands : function() {
             var myrole = this.get('role');
             return myrole == null ? [] : _.filter(_.keys(COMMANDS), function(key) {
@@ -252,7 +252,7 @@ $(function() {
             });
         },
 
-        //Parses and sends message to server
+        /* Parse and sends message to server */
         submit : function(input) {
             var access_level = parseInt(this.get('access_level'));
             var parsed = /^\/(\w+) ?([\s\S]*)/.exec(input);
@@ -310,10 +310,10 @@ $(function() {
             });
         },
 
-        //List of invalid fonts, so errors don't keep showing up
+        /* List of invalid fonts */
         badfonts : [],
 
-        //Adds formating to incoming text
+        /* Add formating to incoming text */
         decorate : function(input) {
             if (input.charAt(0) != '>' || input.search(/(^|[> ])>>\d+/) == 0
             || input.search(/>>>(\/[a-z0-9]+)\/(\d+)?\/?/i) == 0) {
@@ -345,15 +345,15 @@ $(function() {
     }));
 });
 
-// ------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Topic
-// ------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 $(function() {
     var blurred = false;
     var unread = 0;
 
-    //Changes unread count
+    /* Change unread count */
     function updateTitle() {
         var topic = CLIENT.get('topic');
         if (topic) {
@@ -373,7 +373,7 @@ $(function() {
         blurred = false;
         updateTitle();
     });
-    //Updates unread status
+    /* Update unread status */
     CLIENT.on('message', function(message) {
         if (blurred) {
             unread++;
@@ -383,7 +383,7 @@ $(function() {
     CLIENT.on('change:msg', function(m, msg){
         $('#content').html(parser.parse(msg));
     });
-    //Show notification when it is updated
+    /* Show notification when it is updated */
     CLIENT.on('change:notification', function(m, notification) {
         updateTitle();
         parser.getAllFonts(notification);
@@ -392,7 +392,7 @@ $(function() {
             message : notification
         });
     });
-    //Same for the topic
+    /* Show topic when updated */
     CLIENT.on('change:topic', function(m, topic) {
         updateTitle();
         CLIENT.show({
@@ -400,7 +400,7 @@ $(function() {
             message : 'Topic: ' + topic
         });
     });
-    //Set the frame when it is changed
+    /* Set the frame when changed */
     CLIENT.on('change:frame_src', function(m) {
         var url = CLIENT.get('frame_src');
         if(CLIENT.get('frame') == 'on' && parser.linkreg.exec(url) && url){
@@ -416,7 +416,7 @@ $(function() {
             $('#messages').append("<div class=frame><iframe width=\"100%\" height=\"100%\" src=\"" + CLIENT.get('frame_src') + "\"frameborder=\"0\" sandbox=\"allow-same-origin allow-scripts\"></iframe></div>")
         }
     });
-    //Turns play off
+    /* Turn play off */
     CLIENT.on('change:play', function(){
         if(CLIENT.get('play') == 'off'){
             $("#youtube")[0].innerHTML = "";
@@ -431,9 +431,9 @@ $(function() {
     });
 });
 
-// ------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Theme
-// ------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 $(function() {
     CLIENT.on('change:background', function(m, background) {
@@ -455,7 +455,7 @@ $(function() {
             $('#messages').css('background', 'url(/public/css/img/bg.png) center / auto 50% no-repeat rgb(17, 17, 17)');
         }
     });
-    // Set the theme for scrollbar and input textarea
+    /* Set the theme for scrollbar and input textarea */
     CLIENT.on('change:chat_style', function(m, style){
         style = CLIENT.get('chat_style').split(',');
         if (!style[2]) style[2] = '#000';
@@ -468,7 +468,7 @@ $(function() {
         }
     });
 
-    // All attributes to set at init
+    /* Set all attributes at initialization */
     _.each(['images', 'bg', 'styles', 'frame', 'play', 'join'], function(e) {
         CLIENT.set(e, 'on');
     });
@@ -477,18 +477,18 @@ $(function() {
     });
 });
 
-// ------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Online User Tracking
-// ------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 $(function() {
 
-    //Updates menu user count
+    /* Update menu user count */
     function updateCount() {
         $('#tabbed-menu').text(ONLINE.size());
     }
 
-    //Hides and shows popup user menu
+    /* Hide and show popup user menu */
     $('#tabbed-menu').click(function(){
     	var distanceFromTop = $("#tabbed-menu").offset().top - $(window).scrollTop()
     	if ( distanceFromTop < 350 ) {
@@ -508,13 +508,13 @@ $(function() {
         $('.menu-container').css('left',CLIENT.get('menu_left'));
         $('.menu-container').css('top',CLIENT.get('menu_top'));
     }
-    //Adds user to the tabbed menu and updates count
+    /* Add user to the tabbed menu and updates count */
     ONLINE.on('add', function(user) {
         var li = $('<li class="users"></li>').attr({
             class : 'online-' + user.get('id'),
             id : user.get('id')
         }).appendTo('.online');
-        //Limit the maximum length to be displayed
+        /* Limit the maximum length to be displayed */
         var nick = $('<span></span>').text(user.get('nick').substr(0,35)).appendTo(li);
         li.append(' ');
         user.on('change:nick', function() {
@@ -525,7 +525,7 @@ $(function() {
         });
         updateCount();
     });
-    //Remove user div from the menu
+    /* Remove user div from the menu */
     ONLINE.on('remove', function(user) {
         $('.online-' + user.get('id')).remove();
         updateCount();
@@ -549,15 +549,15 @@ $(function() {
     $('#input-bar').droppable({
         accept: '#tabbed-menu-cotainer',
         drop: function (event, ui) {
-            //snap button into place
+            /* Snap button into place */
             $('#tabbed-menu-cotainer').css('top','8px');
             $('#tabbed-menu-cotainer').css('left','');
             $('#tabbed-menu-cotainer').css('right','0');
-            //resize char-bar
+            /* Resize chat bar */
             $('#input-message').css('width','calc(100% - 34px)');
         },
         out: function(event, ui){
-            //expand chat-bar
+            /* Expand chat bar */
             $('#input-message').css('width','100%');
         }
     });
@@ -567,7 +567,7 @@ $(function() {
         className: 'data-title',
         trigger: 'left',
         items: {
-            //Removed until PM Panels are finished.
+            /* Removed until PM Panels are finished. */
             /*"Panel" : {
                 name: "PM Panel",
                 callback: function(){
@@ -626,15 +626,15 @@ $(function() {
     });
 });
 
-// ------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Messages
-// ------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 $(function() {
     var DATE_FORMAT = 'shortTime';
     var roles = ['god','super','admin','mod','basic','mute'];
 
-    //Creates message to be displayed
+    /* Create message to be displayed */
     CLIENT.on('message', function(message) {
         if (typeof message == 'string') {
             message = {
@@ -653,7 +653,7 @@ $(function() {
         }
     });
 
-    //Builds message depending on type
+    /* Build message depending on type */
     function buildMessage(message) {
         var el = $('<div class="message"></div>');
         var sound = 'message';
@@ -662,7 +662,7 @@ $(function() {
         var time = [new Date(), new Date(message.time)][+ !!message.time];
         var check = new RegExp('\\b'+ CLIENT.get('nick') +'\\b','gi');
         var alert = CLIENT.get('alert');
-        //Check if msg contains any keywords
+        /* Check if message contains any keywords */
         for (var i = 0; i < alert.length; i++) {
             if (message.message.indexOf(alert[i]) != -1) {
                 valid = true;
@@ -675,7 +675,7 @@ $(function() {
             }
             window.PM.show(message, message.from);
         }
-        //Make quotable if relevant
+        /* Make quotable if relevant */
         if (message.count){
             el.append($('<div class="timestamp" title=' + message.count + '></div>').text(time.format(DATE_FORMAT) + ' ' + message.count + ' '));
             content = $('<div class="message-content spooky_msg_' + message.count + '"></div>').appendTo(el);
@@ -687,14 +687,14 @@ $(function() {
             el.children().first().css('visibility','hidden');
             el.children().first().css('font-size','0.2em');
         }
-        //Alert the user if their name is mentioned
+        /* Alert the user if their name is mentioned */
         if (((check.test(message.message.replace('\\','')) || valid) && ('chat-message action-message'.split(' ').indexOf(message.type) + 1) || message.type == 'personal-message')
             && message.nick != CLIENT.get('nick')){
             	message.count && el.children('.timestamp').attr('class', "timestamp highlightname");
             	sound = 'name'
                 $("#icon").attr("href","../img/icon.ico");
         }
-        //Alert user if they are quoted
+        /* Alert user if they are quoted */
         if ((message.message.search(/>>(\d)+/g) + 1) && CLIENT.get('nick') != message.nick) {// <--- Not a typo
             var matches = message.message.match(/>>(\d)+/g);
             for (var i = 0, j = matches.length; i < j; i++) {
@@ -750,7 +750,7 @@ $(function() {
             }
             $('<span class="content"></span>').html(parsed || message.message).appendTo(content);
         }
-        //Load and play speak messages
+        /* Load and play speak messages */
         if (message.type == 'spoken-message' && CLIENT.get('mute') != 'on' && CLIENT.get('mute_speak') != 'on') {
             //var voices = ['default','yoda', 'old', 'loli', 'whisper', 'badguy'];
             var uri = message.source || ('http://tts.peniscorp.com/speak.lua?' + encodeURIComponent(message.message));
@@ -789,7 +789,7 @@ $(function() {
     }
 });
 
-//Quotes any clicked message and formats it as needed
+/* Quote any clicked message and formats it as needed */
 $('#messages').on('click', '.message .timestamp', function(e){
     var number = e.currentTarget.title;
     if (number.length) {
@@ -800,11 +800,11 @@ $('#messages').on('click', '.message .timestamp', function(e){
     }
 });
 
-// ------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // PM Panel
-// ------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-//Soon to be in use
+/* Soon to be in use */
 (function() {
     PANELS = {};
     PM = {
@@ -845,9 +845,9 @@ $('#messages').on('click', '.message .timestamp', function(e){
     };
 })();
 
-// ------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Input Box Shadow Color
-// ------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 $(function() {
     function setHighlightColor(color) {
@@ -879,11 +879,11 @@ $(function() {
     });
 });
 
-// ------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Input Form / History
-// ------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-//Manage textarea inputs and actions
+/* Manage textarea inputs and actions */
 $(function() {
     var history = [];
     var historyIndex = -1;
@@ -938,7 +938,7 @@ $(function() {
     var ctrl = false;
     var hover;
 
-    //Make images larger when hovering with ctrl
+    /* Make images larger when hovering with ctrl */
     $(document).keydown(function(e){
         if (e.keyCode == 17 && hover){
             if (hover.localName == 'img'){
@@ -966,7 +966,7 @@ $(function() {
         }
     });
 
-    //Resize textarea on keyup
+    /* Resize textarea on keyup */
     var input = $('#input-message').keyup(function(e) {
         input.css('height', '1px');
         input.css('height', Math.min(Math.max(input.prop('scrollHeight') + 4, 20), $(window).height() / 3) + 'px');
@@ -976,12 +976,12 @@ $(function() {
 
 
 
-// ------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Commands
-// ------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 (function() {
-    //Object with all commands. For more information see ch4t.io/help
+    /* Object with all commands. For more information see ch4t.io/help */
     window.COMMANDS = {
         help : function() {
             CLIENT.show({
@@ -1065,7 +1065,7 @@ $(function() {
             params : [ 'message$' ]
         },
         clear : function() {
-            // Clear #messages and add the /msg element back.
+            /* Clear #messages and add back the msg */
             $('#messages').empty().append("<table id='sam'><tr><td id='content'></td></tr></table>");
         },
         unmute : function() {
@@ -1250,7 +1250,6 @@ $(function() {
                     default:
                         if (att != 'style' && att != 'font') toggled = att;
                 }
-                // Uses unary operator (+)
                 CLIENT.set(toggled, ['on', 'off'][+ (CLIENT.get(toggled) == 'on')]);
             }
         },
@@ -1354,7 +1353,6 @@ $(function() {
                     var url = 'http://' + params.url
                 } else {
                     video('event', 'embed', url);
-                    //console.log(url);
                 }
             }
         }
@@ -1366,7 +1364,7 @@ $(function() {
         options : [{}, function(){}]
     };
 
-    // Initializes all empty objects
+    /* Initialize all empty objects */
     _.each(command_data.blank, function(v, k) {
         _.each(v, function(value) {
             window.COMMANDS[value] = this[k];
@@ -1374,7 +1372,7 @@ $(function() {
     });
 })();
 
-// Add user to a list
+/* Add user to a list */
 add = function(att, user) {
     if (user.toLowerCase() != CLIENT.get('nick').toLowerCase()) {
         var block = CLIENT.get(att);
@@ -1391,7 +1389,7 @@ add = function(att, user) {
     }
 }
 
-// Remove user from a specified list
+/* Remove user */
 remove = function(att, user) {
     var block = CLIENT.get(att);
     var index = block.indexOf(user);
@@ -1404,14 +1402,14 @@ remove = function(att, user) {
     }
 }
 
-// ------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Message Parser
-// ------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-//Used for quote display
+/* Track x and y coordinates for quote display */
 var mouseX;
 var mouseY;
-//Message parser
+/* Message parser */
 parser = {
     linkreg : /(\/embed )?[a-z]+:[\/]+[a-z\d-]+\.[^\s<]+/gi,
     coloreg : '(?:alice|cadet|cornflower|dark(?:slate)?|deepsky|dodger|light(?:sky|steel)?|medium(?:slate)?|midnight|powder|royal|sky|slate|steel)?blue|(?:antique|floral|ghost|navajo)?white|aqua|(?:medium)?aquamarine|blue|beige|bisque|black|blanchedalmond|(?:blue|dark)?violet|(?:rosy|saddle|sandy)?brown|burlywood|chartreuse|chocolate|(?:light)?coral|cornsilk|crimson|(?:dark|light)?cyan|(?:dark|pale)?goldenrod|(?:dark(?:slate)?|dim|light(?:slate)?|slate)?gr(?:a|e)y|(?:dark(?:olive|sea)?|forest|lawn|light(?:sea)?|lime|medium(?:sea|spring)|pale|sea|spring|yellow)?green|(?:dark)?khaki|(?:dark)?magenta|(?:dark)?orange|(?:medium|dark)?orchid|(?:dark|indian|(?:medium|pale)?violet|orange)?red|(?:dark|light)?salmon|(?:dark|medium|pale)?turquoise|(?:deep|hot|light)?pink|firebrick|fuchsia|gainsboro|gold|(?:green|light(?:goldenrod)?)?yellow|honeydew|indigo|ivory|lavender(?:blush)?|lemonchiffon|lime|linen|maroon|(?:medium)?purple|mintcream|mistyrose|moccasin|navy|oldlace|olive(?:drab)?|papayawhip|peachpuff|peru|plum|seashell|sienna|silver|snow|tan|teal|thistle|tomato|wheat|whitesmoke',
@@ -1429,7 +1427,7 @@ parser = {
         if (!this.loadedFonts[family] && CLIENT.badfonts.indexOf(family) == -1) {
             this.loadedFonts[family] = true;
             //var protocol = 'https:' == document.location.protocol ? 'https' : 'http';
-            //Again, more font checking
+            /* More font checking */
             var url = 'https://fonts.googleapis.com/css?family=' + encodeURIComponent(family);
             $.ajax({
                 url : url,
@@ -1456,7 +1454,7 @@ parser = {
             .replace(/</gi, '&lt;')
             .replace(/"/gi, '&quot;')
             .replace(/#/gi, '&#35;')
-        // Codes containing hashtags
+        /* Codes containing hashtags go below */
             .replace(/\$/gi, '&#36;')
             .replace(/'/gi, '&#39;')
             .replace(/~/gi, '&#126;')
@@ -1465,14 +1463,13 @@ parser = {
             .replace(this.repslsh, '\\\\n');
         return str;
     },
-    //Shorter version of parse
     parseLinks : function(str) {
-        // Add HTML codes
+        /* Add HTML codes */
         str = this.convertToHTML(str);
-        // Remove replacement codes
+        /* Remove replacement codes */
         str = str.replace(RegExp(this.replink, 'g'), '');
         str = str.replace(RegExp(this.repslsh, 'g'), '');
-        // Parse links
+        /* Parse links */
         var links = [];
         var prestr= "";
         var poststr = str;
@@ -1492,17 +1489,17 @@ parser = {
         }
         var escs = str.match(/\\./g);
         str = str.replace(/\\./g, this.repslsh);
-        // Replace escapes
+        /* Replace escapes */
         for (i in escs)
             str = str.replace(this.repslsh, escs[i][1]);
-        // Replace links
+        /* Replace links */
         if (links.length > 0) {
             for (var i = 0; i < links.length; i++) {
                 link = links[i].replace(/^((.)(.+))$/, '$1');
                 str = str.replace(this.replink, '<a target="_blank" href="' + link + '">' + link + '</a>');
             }
         }
-        // Parse spaces
+        /* Parse spaces */
         escs = str.match(/<[^>]+?>/gi);
         str = str.replace(/<[^>]+?>/gi, this.repslsh);
         str = str.replace(/\s{2}/gi, ' &nbsp;');
@@ -1514,11 +1511,11 @@ parser = {
         return check.test(str);
     },
     parse : function(str) {
-        // Add HTML codes
+        /* Add HTML codes */
         str = this.convertToHTML(str);
-        // Replace links
+        /* Replace links */
         str = str.replace(this.linkreg, function(match, p1){if (p1) {return match;} else {return '<a target="_blank" href="' + match + '">' + match + '</a>';}});
-        // Filter out embed links (Temporarily Disabled)
+        /* Filter out embed links (Temporarily Disabled) */
         /*
         str = str.replace(/(\\*)\/embed (\S*)/g, function(match, p1, p2){
             var matching = p2.match(this.linkreg);
@@ -1529,17 +1526,17 @@ parser = {
             }
         });*/
 
-        //Word Filters
+        /* Word Filters */
         str = str.replace(/awakens/gi, 'the shitty chat')
     			 .replace(/vegan/gi, 'terrorist')
     			 .replace(/anon2000/gi, 'gaynon2000');
 
-        // Remove replacement codes
+        /* Remove replacement codes */
         str = str.replace(RegExp(this.replink, 'g'), '');
         str = str.replace(RegExp(this.repslsh, 'g'), '');
         var escs = str.match(/\\./g);
         str = str.replace(/\\./g, this.repslsh);
-        // Add styles
+        /* Add styles */
         if (CLIENT.get('styles') == 'on'){
             str = this.multiple(str, /\/\!!([^\|]+)\|?/g, '<div class=neon>$1</div>');
             str = this.multiple(str, /\/\^\^([^\|]+)\|?/g, '<div class=flame>$1</div>');
@@ -1558,10 +1555,10 @@ parser = {
             str = this.multiple(str, /\/\&#126;([^\|]+)\|?/g, '<small>$1</small>');
             str = this.multiple(str, /\/\`([^\|]+)\|?/g, '<code>$1</code>');
         }
-        // Replace >>>/x/<text> with 8ch.net/x/res/<text>
+        /* Replace >>>/x/<text> with 8ch.net/x/res/<text> */
         str = str.replace(/&gt;&gt;&gt;(\/[a-z0-9]+)\/(\d+)?\/?/gi, ' <a target="_blank" href="https://8ch.net$1/$2/">$&</a>');
         str = str.replace(/https:\/\/8chan.co\/([a-z0-9]+)\/res\/"/gi, "https://8ch.net/$1/\"");
-        // Add quotes
+        /* Add quotes */
         var barWidth = 52; //includes quoteDiv border
         function scrollHTML(str1, str2){return '<a onmouseenter = "var quoteDiv = document.createElement(\x27div\x27); quoteDiv.setAttribute(\x27id\x27,\x27quoteDiv\x27); quoteDiv.setAttribute(\x27style\x27,\x27visibility:hidden\x27); setTimeout(function(){$(\x27#quoteDiv\x27).css(\x27visibility\x27,\x27visible\x27);},50); $(\x27#messages\x27).prepend(quoteDiv); $(\x27#quoteDiv\x27).css(\x27position\x27,\x27fixed\x27); $(\x27#quoteDiv\x27).css(\x27z-index\x27,\x275\x27); if (x == undefined){var x = $(document).mousemove(function(e){mouseX = e.pageX; mouseY = e.pageY})} if (quoteDiv != undefined){var msgClone = $(\x27.spooky_msg_'+str2+'\x27).last().parent().clone(); msgClone.children(\x27.message-content\x27).attr(\x27class\x27,\x27message-content msg_quote_'+str2+'\x27); msgClone.find(\x27img\x27).attr(\x27onload\x27,\x27\x27); msgClone.appendTo(\x27#quoteDiv\x27);}if ($(\x27#quoteDiv\x27).height() + mouseY + '+barWidth+' < window.innerHeight){$(\x27#quoteDiv\x27).css({left:mouseX + 30,top:mouseY})}else{$(\x27#quoteDiv\x27).css({left:mouseX + 30,top:window.innerHeight - '+barWidth+' - $(\x27#quoteDiv\x27).height()})}" onmousemove = "if ($(\x27#quoteDiv\x27).height() + mouseY + '+barWidth+' < window.innerHeight){$(\x27#quoteDiv\x27).css({left:mouseX + 30,top:mouseY})}else{$(\x27#quoteDiv\x27).css({left:mouseX + 30,top:window.innerHeight - '+barWidth+' - $(\x27#quoteDiv\x27).height()})}" onmouseout = "$(\x27#quoteDiv\x27).remove();" onclick = "$(\x27#messages\x27).animate({scrollTop: $(\x27.spooky_msg_'+str2+'\x27).last().offset().top - $(\x27#messages\x27).offset().top + $(\x27#messages\x27).scrollTop()},\x27normal\x27,function(){$(\x27.spooky_msg_'+str2+'\x27).last().animate({\x27background-color\x27:\x27rgb(255, 255, 255,0.8)\x27},400,function(){$(\x27.spooky_msg_'+str2+'\x27).last().animate({\x27background-color\x27:\x27transparent\x27},400)});});"><u>'+str1+'</u></a>';}
         function invalidHTML(str){return '<div style = "color: #AD0000">'+str+'</div>';}
@@ -1575,9 +1572,9 @@ parser = {
 	        }
 	    });
         }
-        // Add greentext
+        /* Add greentext
         str = str.replace(/^(&gt;.*)$/i, '&#35;789922 $1');
-        // Javascript links
+        /* Javascript links
         str = str.replace(/(\/\?)([^\|]+)\|([^\|]+)\|?/gi, function(_, __, a, b){
             a = a.replace(/&#35;/gi, '#');
             if(!/[^:]*javascript *:/im.test(a)) {
@@ -1588,23 +1585,23 @@ parser = {
             }
             return '<div><a href="javascript:void(0)" title = "'+a+'" class="jslink" onclick = "'+a+'">' + b.trim() + '</a></div>';
         });
-        // Replace colors
+        /* Replace colors
         str = this.multiple(str, /&#35;&#35;([\da-f]{6}|[\da-f]{3})(.+)$/i, '<span style="background-color: #$1;">$2</span>');
         str = this.multiple(str, /&#35;([\da-f]{6})([^;].*)$/i, '<span style="color: #$1;">$2</span>');
         str = this.multiple(str, /&#35;([\da-f]{3})([^;](?:..[^;].*|.|..|))$/i, '<span style="color: #$1;">$2</span>');
         str = this.multiple(str, RegExp('&#35;&#35;(' + this.coloreg + ')(.+)$', 'i'), '<span style="background-color: $1;">$2</span>');
         str = this.multiple(str, RegExp('&#35;(' + this.coloreg + ')(.+)$', 'i'), '<span style="color: $1;">$2</span>');
         str = this.multiple(str, this.fontRegex, '<span style="font-family:\'$3\'">$4</span>');
-        // Replace escapes
+        /* Replace escapes */
         for (i in escs) {
             str = str.replace(this.repslsh, escs[i][1]);
         }
-        // Parse images
+        /* Parse images */
         var img = /(<a target="_blank" href="[^"]+?">)([^<]+?\.(?:agif|apng|gif|jpg|jpeg|png|bmp|svg))<\/a>/i.exec(str);
         if (img && CLIENT.get('images') == 'on') {
             str = str.replace(img[0], img[1] + '<img src="' + img[2] + '"onload="scrollToBottom()" onerror="imageError(this)" /></a>');
         }
-        // Video embeds
+        /* Embed videos */
         if (str.search(/(youtu(\.)?be)/gi) != -1)
             str = str.replace(/<a [^>]*href="[^"]*(?:youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?"]*)[^"]*">([^<]*)<\/a>/gi, '<a target="_blank" href="$2">$2</a> <a href="javascript:void(0)" onclick="video(event, \'youtube\', \'$1\')" class="show-video">[video]</a>');
             str = str.replace(/<a [^>]*href="[^"]*vimeo.com\/(\d+)">([^<]*)<\/a>/, '<a target="_blank" href="$2">$2</a> <a href="javascript:void(0)" onclick="video(event, \'vimeo\', \'$1\')" class="show-video">[video]</a>');
@@ -1613,9 +1610,9 @@ parser = {
             str = str.replace(/<a [^>]*href="([^'"]*\.mp4)">([^<]*)<\/a>/i, '<a target="_blank" href="$2">$2</a> <a href="javascript:void(0)" onclick="video(event, \'html5\', \'$1\')" class="show-video">[video]</a>');
             str = str.replace(/<a [^>]*href="[^"]*ustream.tv\/embed\/(\d+)\?v=3&amp;wmode=direct">([^<]*)<\/a>/, '<a target="_blank" href="$2">$2</a> <a href="javascript:void(0)" onclick="video(event, \'ustream\', \'$1\')" class="show-video">[video]</a>');
         //    str = str.replace(/<a [^>]*href="[^"]*[i.]?imgur.com\/([A-Za-z]*\.gifv)[^<]*<\/a>/i, '<iframe allowfullscreen="" frameborder="0" scrolling="no" style="max-width: 200px; max-height: 200px;" src="http://$1#embed"></iframe>');
-        // Audio Embeds
+        /* Embed audio */
             str = str.replace(/<a [^>]*href="([^'"]*\.(mp3|wav|ogg|mid|flac))">([^<]*)<\/a>/i, '<a target="_blank" href="$1">$1</a> <a href="javascript:void(0)" onclick="video(event, \'audio\', \'$1\')" class="show-video">[audio]</a>');
-        // Parse spaces
+        /* Parse spaces */
             escs = str.match(/<[^>]+?>/gi);
             str = str.replace(/<[^>]+?>/gi, this.repslsh);
             str = str.replace(/\s{2}/gi, ' &nbsp;');
@@ -1625,12 +1622,12 @@ parser = {
     }
 };
 
-// ------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Height Adjustment
-// ------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 $(function() {
-    // Create and call function to resize chat elements to window
+    /* Create and call function to resize chat elements to window */
     function resize() {
         var width = $(window).width();
         var height = $(window).height();
@@ -1650,9 +1647,9 @@ $(function() {
     $(window).resize(resize); // Add event listener to window
 });
 
-// ------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Autocomplete
-// ------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 $(function() {
     var autoCompleteList = false;
@@ -1775,11 +1772,11 @@ $(function() {
     });
 });
 
-// ------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Audio
-// ------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-//Set up name-mentioned noise
+/* Set up name-mentioned noise */
 (function() {
     var sound = ['name', '/audio/Bwoop.wav'];
     var html = [ '<audio id="', sound[0], '_audio"><source src="', sound[1], '"></source><embed width=0 height=0 src="', sound[1], '"></audio>' ].join('');
@@ -1792,9 +1789,9 @@ $(function() {
     }
 })();
 
-// ------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Video
-// ------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 function video(event, type, input) {
     var embed;
@@ -1911,14 +1908,14 @@ function video(event, type, input) {
     });
 }
 
-// Scroll to bottom on resize
+/* Scroll to bottom on resize */
 window.addEventListener('resize', function(e){
 	scrollToBottom();
 });
 
-/////////////////////////////
+// -----------------------------------------------------------------------------
 // Cursors
-/////////////////////////////
+// -----------------------------------------------------------------------------
 $(function() {
     var position = null, x, y;
     $(window).mousemove(function(e) {
