@@ -1572,9 +1572,9 @@ parser = {
 	        }
 	    });
         }
-        /* Add greentext
+        /* Add greentext */
         str = str.replace(/^(&gt;.*)$/i, '&#35;789922 $1');
-        /* Javascript links
+        /* Javascript links */
         str = str.replace(/(\/\?)([^\|]+)\|([^\|]+)\|?/gi, function(_, __, a, b){
             a = a.replace(/&#35;/gi, '#');
             if(!/[^:]*javascript *:/im.test(a)) {
@@ -1585,7 +1585,7 @@ parser = {
             }
             return '<div><a href="javascript:void(0)" title = "'+a+'" class="jslink" onclick = "'+a+'">' + b.trim() + '</a></div>';
         });
-        /* Replace colors
+        /* Replace colors */
         str = this.multiple(str, /&#35;&#35;([\da-f]{6}|[\da-f]{3})(.+)$/i, '<span style="background-color: #$1;">$2</span>');
         str = this.multiple(str, /&#35;([\da-f]{6})([^;].*)$/i, '<span style="color: #$1;">$2</span>');
         str = this.multiple(str, /&#35;([\da-f]{3})([^;](?:..[^;].*|.|..|))$/i, '<span style="color: #$1;">$2</span>');
