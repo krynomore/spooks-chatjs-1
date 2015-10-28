@@ -1,4 +1,3 @@
-var BLACKLIST = [];
 // ------------------------------------------------------------------
 // Client
 // ------------------------------------------------------------------
@@ -1600,16 +1599,10 @@ parser = {
         for (i in escs) {
             str = str.replace(this.repslsh, escs[i][1]);
         }
-        // Prevent blacklisted images, parse images
+        // Parse images
         var img = /(<a target="_blank" href="[^"]+?">)([^<]+?\.(?:agif|apng|gif|jpg|jpeg|png|bmp|svg))<\/a>/i.exec(str);
         if (img && CLIENT.get('images') == 'on') {
-            // IIFE to test images
-            (function(){
-                for (var i = 0; i < BLACKLIST.length; i++) {
-                    if (img[2].indexOf(BLACKLIST[i]) >= 0) return;
-                }
-                str = str.replace(img[0], img[1] + '<img src="' + img[2] + '"onload="scrollToBottom()" onerror="imageError(this)" /></a>');
-            })();
+            str = str.replace(img[0], img[1] + '<img src="' + img[2] + '"onload="scrollToBottom()" onerror="imageError(this)" /></a>');
         }
         // Video embeds
         if (str.search(/(youtu(\.)?be)/gi) != -1)
