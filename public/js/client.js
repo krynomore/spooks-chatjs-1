@@ -11,9 +11,11 @@ ONLINE = new Backbone.Collection();
 $(function() {
     var socket = io('/' + window.channel);
     var roles = ['god','super','admin','mod','basic','mute'];
+    function unstyle(str){return str.replace(/\//g,'\\/')}
 
     /* Add user to list and show message */
     socket.on('join', function(user) {
+        user.nick = unstyle(user.nick);
         ONLINE.add(user);
         if (CLIENT.get('join') == 'on') {
             CLIENT.show({
@@ -47,6 +49,7 @@ $(function() {
     socket.on('nick', function(info) {
         var user = ONLINE.get(info.id);
         var old = user.get('nick');
+        info.nick = unstyle(info.nick);
         user.set('nick', info.nick);
         CLIENT.show({
             type : 'general-message',
