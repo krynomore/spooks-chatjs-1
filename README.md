@@ -4,24 +4,23 @@ ch4t
 A simple Node.JS chat server with some user management and games.
 
 ## Requirements
-* node.js installed
-* MySQL installed
-* git installed (optional but recommended)
-* forever installed (optional highly recommended)
+* node.js
+* MySQL
+* [git](https://git-scm.com/) (optional)
+* [forever](https://www.npmjs.com/package/forever) (optional)
 
 ## Local Installation
 1. Create a database called nodejs_chat
 2. Add tables by executing /sql/nodejs_chat.sql
 3. Rename default conf/settings.public to conf/settings.json
 
-To run with Forever:
-`forever start server.js`
-For local testing use:
-`nodejs server`
-
-To run without Forever:
-`nohup nodejs server`
-For local testing use:
+To run with Forever:<br>
+`forever start server.js`<br>
+<br>
+To run without Forever:<br>
+`nohup nodejs server`<br>
+<br>
+For local testing use:<br>
 `nodejs server`
 
 ## Developing
