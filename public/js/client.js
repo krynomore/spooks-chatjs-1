@@ -478,8 +478,6 @@ $(function() {
     _.each(['block', 'alert'], function(e) {
         CLIENT.set(e, []);
     });
-    CLIENT.set('mute', 'off');
-    
 });
 
 // -----------------------------------------------------------------------------
@@ -1788,7 +1786,7 @@ $(function() {
     var html = [ '<audio id="', sound[0], '_audio"><source src="', sound[1], '"></source><embed width=0 height=0 src="', sound[1], '"></audio>' ].join('');
     $(html).appendTo('body');
     window.playAudio = function(sound) {
-        if (CLIENT.get('mute') == 'off') {
+        if (CLIENT.get('mute') != 'on') {
             var noise = $('#' + sound + '_audio')[0];
             if (noise) noise.play();
         }
