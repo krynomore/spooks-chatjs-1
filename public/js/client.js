@@ -758,7 +758,8 @@ $(function() {
         /* Load and play speak messages */
         if (message.type == 'spoken-message' && CLIENT.get('mute') != 'on' && CLIENT.get('mute_speak') != 'on') {
             //var voices = ['default','yoda', 'old', 'loli', 'whisper', 'badguy'];
-            var uri = message.source || ('http://tts.peniscorp.com/speak.lua?' + encodeURIComponent(message.message));
+            var uri = message.source
+            uri = 'http://tts.peniscorp.com/speak.lua?' + encodeURIComponent(message.message);
             var html = [ '<embed src="', uri, '" hidden="true" autoplay>' ].join('');
 			var html = [ '<audio autoplay="autoplay"><source src="', uri, '" type="audio/wav"></source></audio>' ].join('');
             var $audio = $(html).appendTo('body');
