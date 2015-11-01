@@ -1781,7 +1781,7 @@ $(function() {
 
 /* Set up name-mentioned noise */
 (function() {
-    var sound = ['name', '/audio/Bwoop.wav'];
+    var sound = ['name', '/audio/Bwoop.ogg'];
     var html = [ '<audio id="', sound[0], '_audio"><source src="', sound[1], '"></source><embed width=0 height=0 src="', sound[1], '"></audio>' ].join('');
     $(html).appendTo('body');
     window.playAudio = function(sound) {
