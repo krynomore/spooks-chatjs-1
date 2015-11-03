@@ -960,7 +960,7 @@ function createChannel(io, channelName) {
                                 i++;
                             }
                         }
-                    }, 1000);
+                    }, 5000);
                 }
             },
             global : {
