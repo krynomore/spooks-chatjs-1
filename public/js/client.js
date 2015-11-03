@@ -1160,7 +1160,7 @@ $(function() {
         },
         reset : {
             role : 'super',
-            params : [ 'nick' ]
+            params : [ 'nick$' ]
         },
         get : {
             params : [ 'attribute' ],
@@ -1265,11 +1265,11 @@ $(function() {
         },
         invite : {
             role : 'super',
-            params : [ 'nick' ]
+            params : [ 'nick$' ]
         },
         uninvite : {
             role : 'super',
-            params : [ 'nick' ]
+            params : [ 'nick$' ]
         },
         whitelist : {
             role : 'super'
@@ -1335,15 +1335,15 @@ $(function() {
         },
         hata : {
             role: 'super',
-            params : [ 'nick', 'hat' ]
+            params : [ 'nick$', 'hat' ]
         },
         hatr : {
             role : 'super',
-            params : [ 'nick', 'hat' ]
+            params : [ 'nick$', 'hat' ]
         },
         hatc : {
             role : 'super',
-            params : [ 'nick', 'hat' ]
+            params : [ 'nick$', 'hat' ]
         },
         warn : {
             role : 'super'
