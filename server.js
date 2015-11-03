@@ -71,11 +71,6 @@ function createChannel(io, channelName) {
             user.remote_addr = user.remote_addr.substring(7,user.remote_addr.length);
         }
 
-        //Get registered
-        socket.on('passgood', function(msg) {
-
-        });
-
         //Set Users Part
         socket.on('SetPart', function(parts) {
             user.part = parts.toString();
