@@ -18,7 +18,7 @@ body {
     background-repeat: no-repeat;
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff3A3A3A',
         endColorstr='#ff292929', GradientType=0 );
-    cursor: url(img/cursor.cur);
+    cursor: url(../img/cursor.cur);
 }
 
 #login {
@@ -821,5 +821,5 @@ a.jslink:visited
     position: absolute;
     width: 25px;
     height: 25px;
-    background: url(img/cursor.cur) no-repeat;
+    background: url(../img/cursor.cur) no-repeat;
 }
