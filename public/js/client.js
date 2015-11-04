@@ -1580,7 +1580,6 @@ parser = {
 	    });
         }
         /* Add greentext */
-        console.log(str);
         str = str.replace(/(&gt;(?!&gt;).*)$/i, '&#35;789922$1');
         /* Javascript links */
         str = str.replace(/(\/\?)([^\|]+)\|([^\|]+)\|?/gi, function(_, __, a, b){
