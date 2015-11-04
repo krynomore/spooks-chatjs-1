@@ -1026,6 +1026,9 @@ $(function() {
             role : 'admin',
             params : [ 'id$' ]
         },
+        clearall : {
+            role : 'super'
+        },
         ban : {
             role : 'admin',
             params : [ 'nick[|message]' ]
