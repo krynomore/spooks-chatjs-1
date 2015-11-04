@@ -294,7 +294,6 @@ function createChannel(io, channelName) {
                     var i = 0;
                     while (i < channel.online.length) {
                         if (!channel.online[i].login) {
-                            channel.online.splice(i, 1);
                             channel.online[i].socket.disconnect();
                         } else
                             i++;
@@ -965,7 +964,6 @@ function createChannel(io, channelName) {
                                     nick : channel.online[i].nick,
                                     part : 'I\'m a spooky ghost!'
                                 });
-                                channel.online.splice(i, 1);
                                 channel.online[i].socket.disconnect();
                                 showMessage(msgs.get('wasGhost', channel.online[i].nick));
                             } else {
