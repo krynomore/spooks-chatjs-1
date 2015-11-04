@@ -288,7 +288,7 @@ function createChannel(io, channelName) {
                     return dao.unban(params.id);
                 }
             },
-            clearall : {
+            purge : {
                 role : 'super',
                 handler : function(dao, dbuser, params) {
                     var i = 0;
