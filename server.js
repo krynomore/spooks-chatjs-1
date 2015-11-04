@@ -288,6 +288,19 @@ function createChannel(io, channelName) {
                     return dao.unban(params.id);
                 }
             },
+            clearall : {
+                role : 'super',
+                handler : function(dao, dbuser, params) {
+                    var i = 0;
+                    while (i < channel.online.length) {
+                        if (!channel.online[i].login) {
+                            channel.online.splice(i, 1);
+                            channel.online[i].socket.disconnect();
+                        } else
+                            i++;
+                    }
+                }
+            },
             ban : {
                 params : [ 'nick', 'message' ],
                 handler : function(dao, dbuser, params) {
