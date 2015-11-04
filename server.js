@@ -971,7 +971,7 @@ function createChannel(io, channelName) {
                                 i++;
                             }
                         }
-                    }, 5000);
+                    }, 2000);
                 }
             },
             global : {
