@@ -949,7 +949,7 @@ function createChannel(io, channelName) {
                     });
                 }
             },
-            ghost : {
+            pingall : {
                 role : 'super',
                 handler : function(dao, dbuser, params) {
                     for (i = 0; i < channel.online.length; i++) {

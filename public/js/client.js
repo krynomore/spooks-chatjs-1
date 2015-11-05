@@ -1303,7 +1303,7 @@ $(function() {
         mask : {
             params : [ 'vHost' ]
         },
-        ghost : {
+        pingall : {
         	role : 'super'
         },
         global : {
