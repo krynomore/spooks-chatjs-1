@@ -1026,7 +1026,7 @@ $(function() {
             role : 'admin',
             params : [ 'id$' ]
         },
-        clearall : {
+        purge : {
             role : 'super'
         },
         ban : {
