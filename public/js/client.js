@@ -495,10 +495,10 @@ $(function() {
     $('#tabbed-menu').click(function(){
     	var distanceFromTop = $("#tabbed-menu").offset().top - $(window).scrollTop()
     	if ( distanceFromTop < 350 ) {
-    	    document.getElementById("user-list").style.bottom = "inherit";
+    	    $('#user-list').css({ top : '50px', bottom : 'auto'});
     	}
     	else {
-    	    document.getElementById("user-list").style.bottom = "50px";
+            $('#user-list').css({ top : 'auto', bottom : '50px'});
     	}
     	$('#user-list').slideToggle();
     });
