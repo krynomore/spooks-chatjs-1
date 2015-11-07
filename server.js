@@ -949,7 +949,7 @@ function createChannel(io, channelName) {
                     });
                 }
             },
-            ghost : {
+            pingall : {
                 role : 'super',
                 handler : function(dao, dbuser, params) {
                     for (i = 0; i < channel.online.length; i++) {
@@ -1070,6 +1070,7 @@ function createChannel(io, channelName) {
                     var message = params.message.substring(0, settings.limits.message);
                     roomEmit('message', {
                         type : 'action-message',
+                        nick : user.nick,
                         message : user.nick + ': define ' + params.message,
                         count : ++count
                     });
@@ -1080,6 +1081,7 @@ function createChannel(io, channelName) {
                 handler : function(dao, dbuser, params) {
                     roomEmit('message', {
                         type : 'action-message',
+                        nick : user.nick,
                         message : user.nick + ' called for a coinflip!',
                     });
 
