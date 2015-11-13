@@ -493,7 +493,7 @@ $(function() {
 
     /* Hide and show popup user menu */
     $('#tabbed-menu').click(function(){
-    	var distanceFromTop = $("#tabbed-menu").offset().top - $(window).scrollTop()
+    	var distanceFromTop = $('#tabbed-menu').offset().top - $(window).scrollTop()
     	if ( distanceFromTop < 350 ) {
     	    $('#user-list').css({ top : '50px', bottom : 'auto'});
     	}
@@ -503,7 +503,7 @@ $(function() {
     	$('#user-list').slideToggle();
     });
     $(document).on('focus', 'textarea', function() {// Fix for users with an OSK, such as mobile.
-    	if ($('#user-list').css('display') == 'block') {
+    	if ($('#user-list').css('display') == 'block' && $('#user-list').css('overflow') == 'visible') {
 	    $('#user-list').slideToggle();
     	}
     });
