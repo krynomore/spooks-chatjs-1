@@ -211,7 +211,7 @@ module.exports = {
         clear_channel : '{0} has cleared the banlist',
         same_topic : 'That is already the topic'
     },
-    limit : 4
+    limit : 5
 };
 
 _.each(settings, function(setting, key) {
