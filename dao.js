@@ -6,7 +6,6 @@ var mysql = require('mysql');
 var passwordHash = require('password-hash');
 var fs = require('fs');
 var pool = mysql.createPool(settings.db);
-var number = 0;
 
 function ucwords(string){
     return string.charAt(0).toUpperCase() + string.slice(1);
@@ -24,7 +23,7 @@ module.exports = function(callback) {
         return {
             /**
              * Get a user attribute.
-             * 
+             *
              * @param {string} attr
              * @returns {*}
              */
@@ -34,7 +33,7 @@ module.exports = function(callback) {
 
             /**
              * Set a user attribute.
-             * 
+             *
              * @param {string|Object} values or key
              * @param {*=} value
              * @returns {$.Promise}
@@ -77,7 +76,7 @@ module.exports = function(callback) {
 
             /**
              * Register & Verify this user.
-             * 
+             *
              * @param {string=} initial_password
              * @returns {$.Promise}
              */
@@ -100,7 +99,7 @@ module.exports = function(callback) {
 
             /**
              * Unregister this user.
-             * 
+             *
              * @returns {$.Promise}
              */
             unregister : function() {
@@ -117,7 +116,7 @@ module.exports = function(callback) {
 
             /**
              * Verify the given password.
-             * 
+             *
              * @param {string} password
              * @returns {boolean}
              */
@@ -127,7 +126,7 @@ module.exports = function(callback) {
 
             /**
              * Change the password.
-             * 
+             *
              * @return {$.Promise}
              */
             change_password : function(old_password, new_password) {
@@ -147,7 +146,7 @@ module.exports = function(callback) {
             },
 
             /**
-             * 
+             *
              * @param {string} access_level
              * @returns {$.Promise}
              */
@@ -162,7 +161,7 @@ module.exports = function(callback) {
                         });
                     } else {
                         return $.Deferred().resolve(false, msgs.invalidAccess);
-                    } 
+                    }
             }
         };
     }
@@ -228,13 +227,13 @@ module.exports = function(callback) {
             return $.Deferred().reject('Invalid nick');
         }
     }
-	
+
 	/**
     * @inner
     * @param {string} vHost
     * @returns {$.Promise<User>}
     */
-	
+
 	function findvHost(vHost) {
 		    if (notEmptyString(vHost)) {
 				return one('select * from chat_users where vHost=?', [ vHost ]).then(function(info) {
@@ -275,7 +274,7 @@ module.exports = function(callback) {
     var dao = {
         /**
          * Create a user.
-         * 
+         *
          * @param {string} nick
          * @param {string} remote_addr
          * @returns {$.Promise<User>}
@@ -307,14 +306,14 @@ module.exports = function(callback) {
 
         /**
          * Find a user.
-         * 
+         *
          * @param {string} nick
          * @returns {$.Promise.<User>}
          */
         findUser : function(nick) {
             return findUser(nick);
         },
-		
+
 		findvHost : function(vHost) {
 			return findvHost(vHost);
 		},
@@ -454,7 +453,7 @@ module.exports = function(callback) {
             }
             return result.promise();
         },
-        
+
         unban_all : function(channel){
             var result = $.Deferred();
             var sql = 'delete from chat_banned where channel=?';
@@ -471,7 +470,7 @@ module.exports = function(callback) {
             });
             return result.promise();
         },
-        
+
         /**
          * @param {string} channel
          * @returns {$.Promise<Array.<string>>}
@@ -569,7 +568,12 @@ module.exports = function(callback) {
          */
         nextNick : function() {
             return one('select count(*) count from chat_users').then(function(row) {
-                return ucwords(_.sample(settings.adjectives)) + ucwords(_.sample(settings.nouns)) + '.' + number++;
+                var res = '';
+                var possible = 'abcdef0123456789'.split('');
+                for (var i = 0; i < settings.limit; i++) {
+                    res += possible[Math.floor(Math.random()*possible.length)];
+                }
+                return res;
             });
         },
 
@@ -579,7 +583,7 @@ module.exports = function(callback) {
                 settings.log.db && console.log('DB Connection released');
             });
         },
-        
+
         GetNick : function(vhost){
             return query('select nick from chat_users where vhost=?', [ vhost ]).then(function(rows) {
                 return rows ? _.map(rows, function(row) {
