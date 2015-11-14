@@ -588,21 +588,23 @@ function createChannel(io, channelName) {
                 role: 'super',
                 params: ['nick'],
                 handler: function(dao, dbuser, params) {
+                    var ip;
+                    var stats = grab(params.nick);
                     return dao.findUser(params.nick).then(function(dbuser) {
-                        var stats = grab(params.nick);
-                        if (stats != -1 || dbuser) {
-                            if (dbuser) {
-                                return dao.find_ip(dbuser.get('remote_addr')).then(function(nicks) {
-                                    if (nicks.length > 0) {
-                                        showMessage(msgs.get('find_ip', params.remote_addr, nicks.join(', ')));
-                                    } else {
-                                        showMessage(msgs.get('find_ip_empty', params.remote_addr));
-                                    }
-                                    return true;
-                                });
-                            } else {
-                                return false;
-                            }
+                        if (stats > -1) {
+                            ip = stats.remote_addr;
+                        } else if (dbuser) {
+                            ip = dbuser.get('remote_addr');
+                        }
+                        if (ip) {
+                            return dao.find_ip(ip).then(function(nicks) {
+                                if (nicks.length > 0) {
+                                    showMessage(msgs.get('find_ip', ip, nicks.join(', ')));
+                                } else {
+                                    showMessage(msgs.get('find_ip_empty', ip));
+                                }
+                                return $.Deferred().resolve(true);
+                            });
                         } else {
                             return $.Deferred().resolve(false, msgs.get('user_doesnt_exist', params.nick));
                         }
