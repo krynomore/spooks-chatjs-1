@@ -1383,7 +1383,7 @@ $(function() {
 add = function(att, user) {
     if (user.toLowerCase() != CLIENT.get('nick').toLowerCase()) {
         var block = CLIENT.get(att);
- -      if (typeof block !== "object") block = JSON.parse(CLIENT.get(att)); 
+        if (typeof block !== "object") block = JSON.parse(CLIENT.get(att)); 
         if (block.indexOf(user) == -1) {
             block.push(user);
             CLIENT.set(att, block);
