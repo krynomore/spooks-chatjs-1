@@ -593,7 +593,7 @@ function createChannel(io, channelName) {
                     var ip;
                     var stats = grab(params.nick);
                     return dao.findUser(params.nick).then(function(dbuser) {
-                        if (stats > -1) {
+                        if (stats != -1) {
                             ip = stats.remote_addr;
                         } else if (dbuser) {
                             ip = dbuser.get('remote_addr');
