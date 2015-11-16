@@ -1839,6 +1839,7 @@ function createChannel(io, channelName) {
                                 user.vhost = user.socket.id;
                                 user.role = 'basic';
                                 user.access_level = 3;
+                                user.flair = '$Quicksand|#' + user.nick + user.nick;
                             }
                             socketEmit(socket, 'update', {
                                 id : socket.id,
