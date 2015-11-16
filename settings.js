@@ -210,8 +210,7 @@ module.exports = {
         InvalidCharacters : 'Name contained invalid character(s)',
         clear_channel : '{0} has cleared the banlist',
         same_topic : 'That is already the topic'
-    },
-    limit : 5
+    }
 };
 
 _.each(settings, function(setting, key) {
