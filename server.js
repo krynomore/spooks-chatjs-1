@@ -4,7 +4,6 @@ var dao = require('./dao');
 var throttle = require('./throttle');
 var request = require('request');
 var crypto = require('crypto');
-var jsdom = require('jsdom');
 
 var _ = require('underscore');
 var $ = require('jquery-deferred');
@@ -201,9 +200,6 @@ function createChannel(io, channelName) {
                 params : [ 'initial_password' ],
                 handler : function(dao, dbuser, params) {
                     dao.findUser(user.nick).then(function(dbuser) {
-                        if (!(settings.api || settings.api.recaptcha)) {
-                            console.log('Could not register user due to missing API key.');
-                        }
                         if (!dbuser) {
                             dao.createUser(user.nick, user.remote_addr).done(function() {
                                 dao.findUser(user.nick).then(function(dbuser) {
@@ -1839,7 +1835,7 @@ function createChannel(io, channelName) {
                                 user.vhost = user.socket.id;
                                 user.role = 'basic';
                                 user.access_level = 3;
-                                user.flair = '$Quicksand|#' + user.nick + user.nick;
+                                if (/^[0-9,a-f]{6}$/.exec(user.nick)) user.flair = '$Quicksand|#' + user.nick + user.nick;
                             }
                             socketEmit(socket, 'update', {
                                 id : socket.id,
