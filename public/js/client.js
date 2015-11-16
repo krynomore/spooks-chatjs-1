@@ -911,7 +911,6 @@ $(function() {
                 text && submit();
                 historyIndex = -1;
                 history.push(text);
-                input.val('');
             }
             return;
         case 38: // up
