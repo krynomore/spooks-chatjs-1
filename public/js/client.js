@@ -1538,7 +1538,7 @@ parser = {
     			 .replace(/vegan/gi, 'terrorist')
     			 .replace(/iplogger\.org/gi, 'I am a big fat faggot please rape my face')
     			 .replace(/2no\.co/gi, 'I am a big fat faggot please rape my face');
-    			 
+
         /* Remove replacement codes */
         str = str.replace(RegExp(this.replink, 'g'), '');
         str = str.replace(RegExp(this.repslsh, 'g'), '');
