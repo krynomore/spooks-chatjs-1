@@ -4,6 +4,7 @@ var dao = require('./dao');
 var throttle = require('./throttle');
 var request = require('request');
 var crypto = require('crypto');
+//var jsdom = require('jsdom');
 
 var _ = require('underscore');
 var $ = require('jquery-deferred');
