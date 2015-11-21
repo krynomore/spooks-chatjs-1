@@ -723,7 +723,7 @@ $(function() {
                 $('<span class="hat ' + message.hat + '" style="background:url(\'/css/img/hats/'+message.hat+'.png\') no-repeat center;background-size: 30px 30px;"></span>').appendTo(content);
             }
             var flair = parsedFlair || message.nick + ':';
-            $('<span class="nick"></span>').text(flair).appendTo(content);
+            $('<span class="nick"></span>').html(flair).appendTo(content);
         }
         if (message.message) {
             var parsed;
