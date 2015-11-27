@@ -166,7 +166,6 @@ $(function() {
                 case 'kick':
                 case 'ban':
                 case 'permaban':
-                case 'speak':
                     var pm = /^(.*?[^\\])(?:\|([\s\S]*))?$/.exec(input);
                     if (pm) {
                         var param1 = pm[1].replace('\\|', '|');
@@ -754,19 +753,6 @@ $(function() {
             }
             $('<span class="content"></span>').html(parsed || message.message).appendTo(content);
         }
-        /* Load and play speak messages */
-        if (message.type == 'spoken-message' && CLIENT.get('mute') != 'on' && CLIENT.get('mute_speak') != 'on') {
-            //var voices = ['default','yoda', 'old', 'loli', 'whisper', 'badguy'];
-            var uri = message.source
-            uri = 'http://tts.peniscorp.com/speak.lua?' + encodeURIComponent(message.message);
-            var html = [ '<embed src="', uri, '" hidden="true" autoplay>' ].join('');
-			var html = [ '<audio autoplay="autoplay"><source src="', uri, '" type="audio/wav"></source></audio>' ].join('');
-            var $audio = $(html).appendTo('body');
-            var audio = $audio[0];
-            audio.onerror = audio.onpause = function(e) {
-                $audio.remove();
-            }
-        }
         playAudio(sound);
         return el;
     }
@@ -1222,9 +1208,6 @@ $(function() {
                     CLIENT.error('Invalid: Variable can be one of [' + valid.join(', ') + ']');
                 }
             }
-        },
-        speak : {
-            params : [ 'message' ]
         },
         elbot : {
             params : [ 'message$' ]
