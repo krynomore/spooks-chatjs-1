@@ -709,7 +709,6 @@ $(function() {
             }
         }
         if (message.nick && message.type != 'action-message') {
-            message.nick = parser.removeHTML(message.nick);
             if (message.flair) {
                 var parsedFlair = parser.parse(message.flair);
                 if (parser.removeHTML(parsedFlair) == message.nick) {
@@ -721,8 +720,11 @@ $(function() {
             if (message.hat != 'nohat' && message.type == 'chat-message') {
                 $('<span class="hat ' + message.hat + '" style="background:url(\'/css/img/hats/'+message.hat+'.png\') no-repeat center;background-size: 30px 30px;"></span>').appendTo(content);
             }
-            var flair = (parsedFlair || message.nick) + ':';
-            $('<span class="nick"></span>').html(flair).appendTo(content);
+            if (parsedFlair) {
+                $('<span class="nick"></span>').html(parsedFlair + ':').appendTo(content);
+            } else {
+                $('<span class="nick"></span>').text(message.nick + ':').appendTo(content);
+            }
         }
         if (message.message) {
             var parsed;
