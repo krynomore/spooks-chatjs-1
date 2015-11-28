@@ -8,6 +8,7 @@ var crypto = require('crypto');
 
 var _ = require('underscore');
 var $ = require('jquery-deferred');
+var cheerio = require('cheerio');
 var express = require('express');
 var fs = require('fs');
 var httpsPort = settings.https && settings.https.port;
@@ -144,7 +145,8 @@ function createChannel(io, channelName) {
                 params : [ 'nick' ],
                 handler : function(dao, dbuser, params) {
                     if (params.nick.trim()) {//Empty string is falsey
-                        return attemptNick(dao, params.nick.substring(0, settings.limits.nick));
+                        var $ = cheerio.load('<div>' + params.nick.substring(0, settings.limits.nick) + '</div>');
+                        return attemptNick(dao, $('div').first().text());
                     }
                     socketEmit(socket,'message',{
                         message : 'Invalid: /nick <nick>',
