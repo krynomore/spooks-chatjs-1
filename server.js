@@ -1390,7 +1390,7 @@ function createChannel(io, channelName) {
                         }
                         if (valid) {
                             for (var x in params) {
-                                params[x] = params[x].replace(/[\u200B-\u200D\uFEFF]/g, '').trim();
+                                params[x] = params[x].replace(/[\u200B-\u200D\uFEFF\u0008\u0000]/g, '').trim();
                             }
                             if (msg.name == 'login' && user.pend) {
                                 return cmd.handler(dao, null, params);
