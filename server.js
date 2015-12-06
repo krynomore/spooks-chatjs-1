@@ -361,9 +361,7 @@ function createChannel(io, channelName) {
                 params : [ 'nick' ],
                 handler : function(dao, dbuser, params) {
                     var stats = grab(params.nick);
-                    if (roles.indexOf(user.role) < 2) {// Make an exception for super+
-                        return dao.ban(params.nick, channelName);
-                    } else if (stats != -1) {
+                    if (stats != -1) {
                         if (roles.indexOf(user.role) < roles.indexOf(stats.role)) {
                             return dao.ban(stats.remote_addr, channelName);
                         } else {
@@ -378,7 +376,11 @@ function createChannel(io, channelName) {
                                     errorMessage(msgs.cannotBan);
                                 }
                             } else {
-                                errorMessage(msgs.get('find_ip_empty', params.nick));
+                                if (roles.indexOf(user.role) < 2) {// Make an exception for super+
+                                    return dao.ban(params.nick, channelName);
+                                } else {
+                                    errorMessage(msgs.get('find_ip_empty', params.nick));
+                                }
                             }
                         });
                     }
