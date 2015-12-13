@@ -214,7 +214,7 @@ $(function() {
     CLIENT = new (Backbone.Model.extend({
         initialize : function() {
             /* Initialize from localstorage. */
-            'color join font style mute mute_speak play nick images security flair styles bg access_level role part menu_top menu_left menu_display mask frame'.split(' ').forEach(function(key) {
+            'color join font style mute play nick images security flair styles bg access_level role part menu_top menu_left menu_display mask frame'.split(' ').forEach(function(key) {
                 var item = localStorage.getItem('chat-' + key);
                 this.set(key, item);
                 this.on('change:' + key, function(m, value) {
@@ -227,7 +227,7 @@ $(function() {
             }, this);
 
             /* Notify when values change. */
-            'color style flair mute play mute_speak images styles bg role access_level part mask frame'.split(' ').forEach(function(key) {
+            'color style flair mute play images styles bg role access_level part mask frame'.split(' ').forEach(function(key) {
                 this.on('change:' + key, function(m, value) {
                     if (value) {
                         this.show(key + ': ' + value);
@@ -424,7 +424,7 @@ $(function() {
             $("#youtube")[0].innerHTML = "";
         }
     });
-    CLIENT.on('change:mute change:mute_speak', function(m, mute) {
+    CLIENT.on('change:mute', function(m, mute) {
         if (mute == 'on') {
             $('audio').each(function() {
                 this.pause();
@@ -472,7 +472,7 @@ $(function() {
 
     /* Set all attributes at initialization */
     _.each(['images', 'bg', 'styles', 'frame', 'play', 'join'], function(e) {
-        CLIENT.set(e, 'on');
+        if (CLIENT.get(e) == undefined) CLIENT.set(e, 'on');
     });
     _.each(['block', 'alert'], function(e) {
         CLIENT.set(e, []);
@@ -1157,7 +1157,7 @@ $(function() {
             params : [ 'attribute' ],
             handler : function(params) {
                 var attribute = params.attribute;
-                var valid = 'theme color font style flair mute mute_speak play images note topic styles bg part block background mask msg alert security frame frame_src join'.split(' ');
+                var valid = 'theme color font style flair mute play images note topic styles bg part block background mask msg alert security frame frame_src join'.split(' ');
                 if (valid.indexOf(attribute) > -1) {
                     switch (attribute) {
                         case 'note':
@@ -1235,10 +1235,6 @@ $(function() {
                         CLIENT.show('Join and leave mesages ' + (join_off ? 'enabled' : 'disabled'));
                         toggled = 'join';
                         break;
-                    case 'speak':
-                    case 'mute_speak':
-                        toggled = 'mute_speak';
-                        break;
                     default:
                         if (att != 'style' && att != 'font') toggled = att;
                 }
@@ -1270,7 +1266,6 @@ $(function() {
             CLIENT.set({
                 bg: 'off',
                 images: 'off',
-                mute_speak: 'on',
                 frame: 'off'
             });
         },
@@ -1278,7 +1273,6 @@ $(function() {
             CLIENT.set({
                 bg: 'on',
                 images: 'on',
-                mute_speak: 'off',
                 frame: 'on'
             });
         },
