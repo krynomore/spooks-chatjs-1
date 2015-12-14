@@ -568,12 +568,8 @@ module.exports = function(callback) {
          */
         nextNick : function() {
             return one('select count(*) count from chat_users').then(function(row) {
-                var res = '';
-                var possible = 'abcdef56789'.split('');
-                for (var i = 0; i < 6; i++) {// Hex-colored nicks
-                    res += possible[Math.floor(Math.random()*possible.length)];
-                }
-                return res;
+               function x(){ return parseInt((Math.random()+0.457142857142857)*175).toString(16) }
+               return x().concat(x(),x());
             });
         },
 
