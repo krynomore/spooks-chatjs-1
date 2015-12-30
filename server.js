@@ -1957,7 +1957,7 @@ function createChannel(io, channelName) {
                 roomEmit('message', {
                     type: 'chat-message',
                     nick: 'AwksBot',
-                    flair: '$Josefin Sans|/^/^#afa888Master#666Bot',
+                    flair: '$Josefin Sans|/^/^#afaMaster#888Bot',
                     message: msg,
                     count: count
                 });
